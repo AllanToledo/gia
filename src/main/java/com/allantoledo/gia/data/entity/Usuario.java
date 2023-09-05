@@ -1,33 +1,32 @@
 package com.allantoledo.gia.data.entity;
 
-import com.allantoledo.gia.data.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Set;
-
+//@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "application_user")
+@Table(name = "application_user", indexes = {
+        @Index(columnList = "cpf", unique = true)
+})
 @Data
-public class Usuario extends AbstractEntity {
+public class Usuario {
 
-    private String username;
-    private String name;
+    @Id
     private String cpf;
 
+    public String nome;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean ativado = true;
+
     @JsonIgnore
-    private String hashedPassword;
+    private String senhaCriptografada;
 
     @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    private Role role;
 
+    public enum Role {
+        TECNICO, GESTOR;
+    }
 }

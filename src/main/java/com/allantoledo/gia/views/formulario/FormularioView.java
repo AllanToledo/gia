@@ -20,7 +20,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Formulario")
 @Route(value = "about", layout = MainLayout.class)
-@RolesAllowed("USER")
+@RolesAllowed("TECNICO")
 @Uses(Icon.class)
 public class FormularioView extends Composite<VerticalLayout> {
 

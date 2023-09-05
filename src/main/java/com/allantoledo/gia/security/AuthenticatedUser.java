@@ -22,7 +22,7 @@ public class AuthenticatedUser {
     @Transactional
     public Optional<Usuario> get() {
         return authenticationContext.getAuthenticatedUser(UserDetails.class)
-                .map(userDetails -> usuarioRepository.findByUsername(userDetails.getUsername()));
+                .map(userDetails -> usuarioRepository.findByCpf(userDetails.getUsername()));
     }
 
     public void logout() {

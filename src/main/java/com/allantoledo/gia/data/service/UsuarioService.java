@@ -33,9 +33,9 @@ public class UsuarioService {
         return repository.findAll(pageable);
     }
 
-    public Page<Usuario> list(Pageable pageable, Specification<Usuario> filter) {
-        return repository.findAll(filter, pageable);
-    }
+//    public Page<Usuario> list(Pageable pageable, Specification<Usuario> filter) {
+//        return repository.findAll(filter, pageable);
+//    }
 
     public int count() {
         return (int) repository.count();
