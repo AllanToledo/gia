@@ -7,11 +7,13 @@ import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "fk_item_id")
 })
-public class Historico extends AbstractEntity{
+public class Historico{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String estadoAnterior;
     private String estadoNovo;
     @JsonIgnore

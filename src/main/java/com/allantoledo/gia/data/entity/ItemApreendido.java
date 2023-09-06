@@ -17,12 +17,14 @@ import java.util.Set;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "numeroProcesso"),
         @Index(columnList = "nomeItem")
 })
-public class ItemApreendido extends AbstractEntity {
+public class ItemApreendido{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String numeroProcesso;
     private Date dataApreensao;
     private BigDecimal valorAvaliado;

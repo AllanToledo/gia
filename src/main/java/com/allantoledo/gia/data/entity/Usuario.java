@@ -5,20 +5,22 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-//@EqualsAndHashCode(callSuper = true)
+
 @Entity
-@Table(name = "application_user", indexes = {
+@Table(name = "usuario", indexes = {
         @Index(columnList = "cpf", unique = true)
 })
 @Data
 public class Usuario {
 
     @Id
-    private String cpf;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public String nome;
+    private String cpf;
+    private String nome;
     @Column(columnDefinition = "boolean default true")
-    private Boolean ativado = true;
+    private Boolean ativado;
 
     @JsonIgnore
     private String senhaCriptografada;
@@ -29,4 +31,5 @@ public class Usuario {
     public enum Role {
         TECNICO, GESTOR;
     }
+
 }

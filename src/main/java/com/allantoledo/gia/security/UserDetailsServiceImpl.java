@@ -24,12 +24,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String cpf) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findAll().get(0);
-        System.out.println(cpf);
-        System.out.println(usuario);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByCpf(username);
         if (usuario == null) {
-            throw new UsernameNotFoundException("Nenhum usuário cadastrado com CPF: " + cpf);
+            throw new UsernameNotFoundException("Nenhum usuário cadastrado com CPF: " + username);
         } else {
             if(!usuario.getAtivado()) throw new UsernameNotFoundException("Usuário desativado");
             return new User(usuario.getCpf(), usuario.getSenhaCriptografada(), getAuthorities(usuario));
