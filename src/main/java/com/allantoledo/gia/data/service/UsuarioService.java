@@ -3,6 +3,7 @@ package com.allantoledo.gia.data.service;
 import com.allantoledo.gia.data.entity.Usuario;
 import java.util.Optional;
 
+import com.allantoledo.gia.data.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
-
     public UsuarioService(UsuarioRepository repository) {
         this.repository = repository;
     }
@@ -33,9 +33,9 @@ public class UsuarioService {
         return repository.findAll(pageable);
     }
 
-//    public Page<Usuario> list(Pageable pageable, Specification<Usuario> filter) {
-//        return repository.findAll(filter, pageable);
-//    }
+    public Page<Usuario> list(Pageable pageable, Specification<Usuario> filter) {
+        return repository.findAll(filter, pageable);
+    }
 
     public int count() {
         return (int) repository.count();

@@ -1,4 +1,4 @@
-package com.allantoledo.gia.views.dashboard;
+package com.allantoledo.gia.views.anonimo.dashboard;
 
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.Composite;

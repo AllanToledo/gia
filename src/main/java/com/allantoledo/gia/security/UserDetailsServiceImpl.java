@@ -1,9 +1,9 @@
 package com.allantoledo.gia.security;
 
 import com.allantoledo.gia.data.entity.Usuario;
-import com.allantoledo.gia.data.service.UsuarioRepository;
+import com.allantoledo.gia.data.repository.UsuarioRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

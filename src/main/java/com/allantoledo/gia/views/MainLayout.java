@@ -2,8 +2,8 @@ package com.allantoledo.gia.views;
 
 import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.security.AuthenticatedUser;
-import com.allantoledo.gia.views.dashboard.DashboardView;
-import com.allantoledo.gia.views.gestor.formulario.FormularioView;
+import com.allantoledo.gia.views.anonimo.dashboard.DashboardView;
+import com.allantoledo.gia.views.gestor.cadastrarTecnico.CadastrarTecnico;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -42,6 +42,7 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
+
     }
 
     private void addHeaderContent() {
@@ -72,8 +73,8 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.GRIP_VERTICAL_SOLID.create()));
 
         }
-        if (accessChecker.hasAccess(FormularioView.class)) {
-            nav.addItem(new SideNavItem("Formulario", FormularioView.class, LineAwesomeIcon.USER.create()));
+        if (accessChecker.hasAccess(CadastrarTecnico.class)) {
+            nav.addItem(new SideNavItem("Formulario", CadastrarTecnico.class, LineAwesomeIcon.USER.create()));
 
         }
 

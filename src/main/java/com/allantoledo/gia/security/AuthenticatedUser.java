@@ -1,7 +1,7 @@
 package com.allantoledo.gia.security;
 
 import com.allantoledo.gia.data.entity.Usuario;
-import com.allantoledo.gia.data.service.UsuarioRepository;
+import com.allantoledo.gia.data.repository.UsuarioRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
