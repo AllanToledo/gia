@@ -1,5 +1,6 @@
 package com.allantoledo.gia.data.entity;
 
+import com.allantoledo.gia.validations.ValidCpfOrCnpj;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +15,7 @@ public class Deposito {
     private Long id;
     private String nome;
     private String contato;
+    @ValidCpfOrCnpj
     private String cpfCnpj;
     private boolean depositarioFiel;
     @OneToOne

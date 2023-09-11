@@ -1,6 +1,7 @@
 package com.allantoledo.gia.data.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,5 +14,6 @@ public class CategoriaItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Size(max=80)
     private String nomeCategoria;
 }

@@ -1,9 +1,11 @@
 package com.allantoledo.gia.data.entity;
 
 import com.allantoledo.gia.data.converter.JpaConverterJson;
+import com.allantoledo.gia.validations.ValidCpf;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import elemental.json.JsonType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,15 +27,20 @@ public class ItemApreendido{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Size(max=20)
     private String numeroProcesso;
     private Date dataApreensao;
+    @DecimalMin(value = "0")
     private BigDecimal valorAvaliado;
+    @Size(max=80)
     private String nomeItem;
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, String> descricao;
+    @ValidCpf
     private String cpfProprietario;
-    private String estadoDoObjeto;
+    @Enumerated(EnumType.STRING)
+    private EstadoDoObjeto estadoDoObjeto;
 
     @ManyToOne()
     private Deposito deposito;
@@ -43,12 +50,20 @@ public class ItemApreendido{
     private OrgaoApreensor orgaoApreensor;
 
     @OneToMany(mappedBy = "itemApreendido")
-    @Size(min=0, max=10)
+    @Size(max=10)
     private Set<Historico> historicos;
 
     @ManyToMany
     private Set<CategoriaItem> categorias;
     @ManyToMany
     private Set<ClasseProcesso> classes;
+
+    public enum EstadoDoObjeto {
+        EM_DEPOSITO,
+        ENVIADO_PARA_DESTRUICAO,
+        ENVIADO_PARA_DOACAO,
+        ENVIADO_PARA_LEILAO,
+        RECONSTITUIDO
+    }
 
 }

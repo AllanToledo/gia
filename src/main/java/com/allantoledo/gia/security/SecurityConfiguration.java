@@ -1,6 +1,6 @@
 package com.allantoledo.gia.security;
 
-import com.allantoledo.gia.views.login.LoginView;
+import com.allantoledo.gia.views.anonimo.login.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

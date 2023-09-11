@@ -1,4 +1,4 @@
-package com.allantoledo.gia.views.login;
+package com.allantoledo.gia.views.anonimo.login;
 
 import com.allantoledo.gia.security.AuthenticatedUser;
 import com.vaadin.flow.component.login.LoginI18n;
