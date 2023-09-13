@@ -1,6 +1,7 @@
 package com.allantoledo.gia.data.service;
 
 import com.allantoledo.gia.data.entity.Usuario;
+
 import java.util.Optional;
 
 import com.allantoledo.gia.data.repository.UsuarioRepository;
@@ -12,7 +13,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsuarioService {
 
+    public static class UsuarioSpecification {
+        public static final String NOME = "nome";
+        private UsuarioSpecification() {}
+        public static Specification<Usuario> filterByName(String nome) {
+            return Specification.where(nomeLike(nome));
+        }
+        private static Specification<Usuario> nomeLike(String nome) {
+            return ((root, query, cb) -> nome == null || nome.isEmpty() ?
+                    cb.conjunction() :
+                    cb.like(root.get(NOME), "%" + nome + "%"));
+        }
+    }
+
     private final UsuarioRepository repository;
+
     public UsuarioService(UsuarioRepository repository) {
         this.repository = repository;
     }

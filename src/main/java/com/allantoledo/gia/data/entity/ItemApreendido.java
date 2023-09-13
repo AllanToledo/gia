@@ -2,18 +2,13 @@ package com.allantoledo.gia.data.entity;
 
 import com.allantoledo.gia.data.converter.JpaConverterJson;
 import com.allantoledo.gia.validations.ValidCpf;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import elemental.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,9 +48,9 @@ public class ItemApreendido{
     @Size(max=10)
     private Set<Historico> historicos;
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     private Set<CategoriaItem> categorias;
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     private Set<ClasseProcesso> classes;
 
     public enum EstadoDoObjeto {

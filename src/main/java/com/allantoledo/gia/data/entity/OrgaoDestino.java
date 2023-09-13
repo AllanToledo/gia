@@ -23,6 +23,6 @@ public class OrgaoDestino {
     private String cpfCnpj;
     @OneToOne
     private Endereco endereco;
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     private Set<CategoriaItem> categoriasAceitas;
 }

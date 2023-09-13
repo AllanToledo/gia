@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
@@ -15,12 +14,12 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(max=80)
-    private String rua;
+    private String logradouro;
     @Size(max=80)
     private String bairro;
     @Size(max=80)
     private String cidade;
-    @Size(max=80)
+    @Size(max=2)
     private String estado;
     @Size(max=8)
     private String cep;

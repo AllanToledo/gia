@@ -3,7 +3,12 @@ package com.allantoledo.gia.views;
 import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.security.AuthenticatedUser;
 import com.allantoledo.gia.views.anonimo.dashboard.DashboardView;
-import com.allantoledo.gia.views.gestor.cadastrarTecnico.CadastrarTecnico;
+import com.allantoledo.gia.views.gestor.crudDeposito.CadastrarDeposito;
+import com.allantoledo.gia.views.gestor.crudOrganizacoes.CadastrarOrgaoDestino;
+import com.allantoledo.gia.views.gestor.crudOrganizacoes.ListarOrgaosDestino;
+import com.allantoledo.gia.views.gestor.crudTecnico.CadastrarTecnico;
+import com.allantoledo.gia.views.gestor.crudTecnico.ListarDeposito;
+import com.allantoledo.gia.views.gestor.crudTecnico.ListarTecnico;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -69,13 +74,16 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         if (accessChecker.hasAccess(DashboardView.class)) {
-            nav.addItem(
-                    new SideNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.GRIP_VERTICAL_SOLID.create()));
+            nav.addItem(new SideNavItem("Dashboard", DashboardView.class, LineAwesomeIcon.GRIP_VERTICAL_SOLID.create()));
 
         }
         if (accessChecker.hasAccess(CadastrarTecnico.class)) {
-            nav.addItem(new SideNavItem("Formulario", CadastrarTecnico.class, LineAwesomeIcon.USER.create()));
-
+            nav.addItem(new SideNavItem("Novo Tecnico", CadastrarTecnico.class, LineAwesomeIcon.USER.create()));
+            nav.addItem(new SideNavItem("Listar Tecnicos", ListarTecnico.class, LineAwesomeIcon.USER.create()));
+            nav.addItem(new SideNavItem("Novo Deposito", CadastrarDeposito.class, LineAwesomeIcon.WAREHOUSE_SOLID.create()));
+            nav.addItem(new SideNavItem("Listar Depositos", ListarDeposito.class, LineAwesomeIcon.WAREHOUSE_SOLID.create()));
+            nav.addItem(new SideNavItem("Nova Organização", CadastrarOrgaoDestino.class, LineAwesomeIcon.BUILDING.create()));
+            nav.addItem(new SideNavItem("Listar Organizações", ListarOrgaosDestino.class, LineAwesomeIcon.BUILDING.create()));
         }
 
         return nav;

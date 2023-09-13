@@ -1,16 +1,16 @@
-package com.allantoledo.gia.views.gestor.cadastrarTecnico;
+package com.allantoledo.gia.views.gestor.crudTecnico;
 
 import com.allantoledo.gia.data.entity.Usuario;
-import com.allantoledo.gia.data.repository.UsuarioRepository;
+import com.allantoledo.gia.data.service.UsuarioService;
 import com.allantoledo.gia.views.MainLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
@@ -21,66 +21,105 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @PageTitle("Tecnicos")
-@Route(value = "about", layout = MainLayout.class)
+@Route(value = "cadastrartecnico", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class CadastrarTecnico extends VerticalLayout {
+public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<Long> {
 
-    UsuarioRepository usuarioRepository;
+    UsuarioService usuarioService;
 
     PasswordEncoder passwordEncoder;
 
     Validator validator;
-    public CadastrarTecnico(UsuarioRepository usuarioRepository,
+
+    Usuario tecnicoCadastrado;
+
+    public CadastrarTecnico(UsuarioService usuarioService,
                             PasswordEncoder passwordEncoder,
                             Validator validator) {
-        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
         this.passwordEncoder = passwordEncoder;
         this.validator = validator;
+    }
 
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Long parameter) {
+        if (parameter != null) {
+            tecnicoCadastrado = usuarioService.get(parameter).orElse(null);
+        }
+        carregarTela();
+    }
 
+    public void carregarTela() {
         FormLayout formLayout = new FormLayout();
         TextField nomeCompletoField = new TextField("NOME COMPLETO");
         TextField cpfField = new TextField("CPF (Somente números)");
         TextField senhaField = new TextField("SENHA");
+        Button ativadoButton = new Button("ATIVADO");
+        AtomicBoolean usuarioAtivado = new AtomicBoolean(true);
+        ativadoButton.addClickListener(buttonClickEvent -> {
+            usuarioAtivado.set(!usuarioAtivado.get());
+            ativadoButton.setText(usuarioAtivado.get()? "ATIVADO": "DESATIVADO");
+        });
         senhaField.setReadOnly(true);
         senhaField.setValue(gerarSenhaAleatoria());
+
+        if (tecnicoCadastrado != null) {
+            nomeCompletoField.setValue(tecnicoCadastrado.getNome());
+            cpfField.setValue(tecnicoCadastrado.getCpf());
+            senhaField.setValue("");
+            usuarioAtivado.set(!tecnicoCadastrado.getAtivado());
+            ativadoButton.click();
+        }
 
         Button cancelar = new Button("CANCELAR");
         cancelar.addClickListener((buttonClickEvent) -> {
             cpfField.clear();
             nomeCompletoField.clear();
             senhaField.setValue(gerarSenhaAleatoria());
+            if(tecnicoCadastrado != null) UI.getCurrent().getPage().getHistory().back();
         });
 
-        Button cadastrar = new Button("CADASTRAR");
+        Button cadastrar = new Button(tecnicoCadastrado != null ? "ATUALIZAR" : "CADASTRAR");
         cadastrar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cadastrar.addClickListener((buttonClickEvent) -> {
-            Usuario novoTecnico = new Usuario();
-            novoTecnico.setAtivado(true);
+            Usuario novoTecnico;
+
+            novoTecnico = Objects.requireNonNullElseGet(tecnicoCadastrado, Usuario::new);
+            novoTecnico.setAtivado(usuarioAtivado.get());
             novoTecnico.setNome(nomeCompletoField.getValue());
             novoTecnico.setCpf(cpfField.getValue().replaceAll("[^0-9]", ""));
-            novoTecnico.setSenhaCriptografada(passwordEncoder.encode(senhaField.getValue()));
+
+            if(tecnicoCadastrado == null)
+                novoTecnico.setSenhaCriptografada(passwordEncoder.encode(senhaField.getValue()));
+
             novoTecnico.setRole(Usuario.Role.TECNICO);
             Set<ConstraintViolation<Usuario>> violations = validator.validate(novoTecnico);
-            for(var violation: violations){
+            for (var violation : violations) {
                 Notification.show(violation.getMessage());
             }
-            if(!violations.isEmpty()) return;
-            usuarioRepository.save(novoTecnico);
-            Notification.show("Técnico cadastrado com sucesso");
+            if (!violations.isEmpty()) return;
+            usuarioService.update(novoTecnico);
+            if(tecnicoCadastrado != null){
+                Notification.show("Técnico atualizado com sucesso");
+            } else {
+                Notification.show("Técnico cadastrado com sucesso");
+            }
             cancelar.click();
         });
 
-        formLayout.add(nomeCompletoField, cpfField, senhaField);
+        formLayout.add(nomeCompletoField, cpfField, senhaField, ativadoButton);
         formLayout.setResponsiveSteps(
                 new ResponsiveStep("0", 1),
-                new ResponsiveStep("10cm", 2));
-        formLayout.setColspan(nomeCompletoField, 2);
+                new ResponsiveStep("10cm", 2),
+                new ResponsiveStep("15cm", 3));
+        formLayout.setColspan(nomeCompletoField, 3);
 
         this.setMaxWidth("16cm");
         add(new H3("Cadastrar Novo Técnico"));
@@ -94,8 +133,10 @@ public class CadastrarTecnico extends VerticalLayout {
     String gerarSenhaAleatoria() {
         Random random = new Random();
         StringBuilder senhaAleatoria = new StringBuilder();
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
             senhaAleatoria.append((char) ('a' + random.nextInt(26)));
         return senhaAleatoria.toString();
     }
+
+
 }
