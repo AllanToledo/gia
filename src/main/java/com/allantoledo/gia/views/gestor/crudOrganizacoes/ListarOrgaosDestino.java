@@ -12,6 +12,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -25,8 +26,8 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@PageTitle("OrgaoDestinos")
-@Route(value = "listardeposito", layout = MainLayout.class)
+@PageTitle("Organizações")
+@Route(value = "organizacoes", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarOrgaosDestino extends VerticalLayout{
@@ -90,8 +91,16 @@ public class ListarOrgaosDestino extends VerticalLayout{
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("10cm", 3));
         formLayout.setColspan(searchField, 2);
 
+        Button criarNovaOrganizacao = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovaOrganizacao.addClickListener(buttonClickEvent -> {
+            criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class));
+        });
+
+        HorizontalLayout header = new HorizontalLayout();
+        header.add(new H3("Pesquisar Organizações de Destino"), criarNovaOrganizacao);
+        header.setAlignItems(Alignment.CENTER);
         setMaxWidth("16cm");
-        add(new H3("Pesquisar Orgãos de Destino"));
+        add(header);
         add(formLayout);
         add(results);
     }

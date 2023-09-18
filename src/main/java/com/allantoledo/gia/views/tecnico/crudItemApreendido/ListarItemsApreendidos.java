@@ -1,9 +1,9 @@
-package com.allantoledo.gia.views.gestor.crudDeposito;
+package com.allantoledo.gia.views.tecnico.crudItemApreendido;
 
-import com.allantoledo.gia.data.entity.Deposito;
-import com.allantoledo.gia.data.service.DepositoService;
+import com.allantoledo.gia.data.entity.CategoriaItem;
+import com.allantoledo.gia.data.entity.ItemApreendido;
+import com.allantoledo.gia.data.service.ItemApreendidoService;
 import com.allantoledo.gia.views.MainLayout;
-import com.allantoledo.gia.views.gestor.crudDeposito.CadastrarDeposito;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -27,64 +27,78 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@PageTitle("Depositos")
-@Route(value = "depositos", layout = MainLayout.class)
-@RolesAllowed("GESTOR")
-@Uses(Icon.class)
-public class ListarDeposito extends VerticalLayout{
-    DepositoService depositoService;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 
-    private String formatCpf(String cpfOrCnpj){
-        if(cpfOrCnpj.length() > 11) return cpfOrCnpj;
-        return cpfOrCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
+@PageTitle("Depositos")
+@Route(value = "apreensoes", layout = MainLayout.class)
+@RolesAllowed("TECNICO")
+@Uses(Icon.class)
+public class ListarItemsApreendidos extends VerticalLayout {
+    ItemApreendidoService itemApreendidoService;
+
+    private String formatCpf(String cpf) {
+        if (cpf == null) return "";
+        if (cpf.length() > 11) return cpf;
+        return cpf.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
     }
 
-    private final ComponentRenderer<Component, Deposito> resultCardRenderer = new ComponentRenderer<>(
-            deposito -> {
+    public static String currencyFormat(BigDecimal n) {
+        return NumberFormat.getCurrencyInstance().format(n);
+    }
+
+    private final ComponentRenderer<Component, ItemApreendido> resultCardRenderer = new ComponentRenderer<>(
+            itemApreendido -> {
                 HorizontalLayout cardLayout = new HorizontalLayout();
-                //cardLayout.setMargin(true);
                 cardLayout.setPadding(true);
                 cardLayout.addClassNames(
                         LumoUtility.Background.CONTRAST_5,
                         LumoUtility.BorderRadius.MEDIUM,
                         LumoUtility.Margin.Vertical.SMALL
                 );
-                //cardLayout.setWidthFull();
                 cardLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
                 cardLayout.setAlignItems(Alignment.CENTER);
 
                 VerticalLayout infoLayout = new VerticalLayout();
                 infoLayout.setSpacing(false);
                 infoLayout.setPadding(false);
-                infoLayout.getElement().appendChild(ElementFactory.createStrong(deposito.getNome()));
-                HorizontalLayout dados = new HorizontalLayout();
-                dados.add(new Div(new Text(formatCpf(deposito.getCpfCnpj()))));
-                dados.add(new Div(new Text(deposito.getContato())));
+                infoLayout.getElement().appendChild(ElementFactory.createStrong(itemApreendido.getNumeroProcesso()));
+                infoLayout.add(new Div(new Text("Data da Apreensão " + itemApreendido.getDataApreensao().format(DateTimeFormatter.ISO_DATE))));
+                if (itemApreendido.getCpfProprietario() != null && itemApreendido.getCpfProprietario().length() != 0)
+                    infoLayout.add(new Div(new Text(formatCpf(itemApreendido.getCpfProprietario()))));
+
+                infoLayout.add(new Div(new Text(itemApreendido.getCategorias()
+                        .stream()
+                        .map(CategoriaItem::getNomeCategoria)
+                        .reduce("", (result, categoriaItem) -> result + categoriaItem + " "))));
+                if (itemApreendido.getValorAvaliado() != null)
+                    infoLayout.add(new Div(new Text("Item Avaliado em " + currencyFormat(itemApreendido.getValorAvaliado()))));
+
                 Button editar = new Button("EDITAR");
                 editar.addClickListener(buttonClickEvent -> {
-                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class, deposito.getId()));
+                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class, itemApreendido.getId()));
                 });
-                infoLayout.add(dados);
                 cardLayout.add(infoLayout, editar);
                 return cardLayout;
             });
 
 
-    public ListarDeposito(DepositoService depositoService){
-        this.depositoService = depositoService;
-        VirtualList<Deposito> results = new VirtualList<>();
+    public ListarItemsApreendidos(ItemApreendidoService itemApreendidoService) {
+        this.itemApreendidoService = itemApreendidoService;
+        VirtualList<ItemApreendido> results = new VirtualList<>();
         results.setRenderer(resultCardRenderer);
 
         Pageable resultsPage = PageRequest.of(0, 10);
         FormLayout formLayout = new FormLayout();
         TextField searchField = new TextField();
-        searchField.setPlaceholder("Pesquisar por nome");
+        searchField.setPlaceholder("Pesquisar por processo");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
         searchButton.addClickListener(buttonClickEvent -> {
             results.setItems(
-                    depositoService.list(resultsPage,
-                                    DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
+                    itemApreendidoService.list(resultsPage,
+                                    ItemApreendidoService.ItemApreendidoSpecification.filterByProcess(searchField.getValue()))
                             .stream()
             );
         });
@@ -96,11 +110,11 @@ public class ListarDeposito extends VerticalLayout{
 
         Button criarNovoDeposito = new Button(new Icon(VaadinIcon.PLUS));
         criarNovoDeposito.addClickListener(buttonClickEvent -> {
-            criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class));
+            criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class));
         });
 
         HorizontalLayout header = new HorizontalLayout();
-        header.add(new H3("Pesquisar Depósitos"), criarNovoDeposito);
+        header.add(new H3("Pesquisar Apreensões"), criarNovoDeposito);
         header.setAlignItems(Alignment.CENTER);
 
         setMaxWidth("16cm");

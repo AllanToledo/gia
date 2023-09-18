@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDataba
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Locale;
+
 /**
  * The entry point of the Spring Boot application.
  *
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
+        Locale.setDefault(Locale.forLanguageTag("PT-BR"));
         SpringApplication.run(Application.class, args);
     }
 

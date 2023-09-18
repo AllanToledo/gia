@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @PageTitle("Depositos")
-@Route(value = "cadastrardeposito", layout = MainLayout.class)
+@Route(value = "depositos/update", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter<Long> {
@@ -141,7 +141,7 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
             cidadeField.clear();
             estadoField.clear();
 
-            if (depositoCadastrado != null) UI.getCurrent().getPage().getHistory().back();
+            UI.getCurrent().getPage().getHistory().back();
         });
 
         ConfirmDialog dialog = new ConfirmDialog();

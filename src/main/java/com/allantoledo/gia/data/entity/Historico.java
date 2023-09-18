@@ -5,21 +5,22 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Table(indexes = {
-        @Index(columnList = "fk_item_id")
+//        @Index(columnList = "item_apreendido_id")
 })
 public class Historico{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "text")
     private String estadoAnterior;
+    @Column(columnDefinition = "text")
     private String estadoNovo;
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name="fk_item_id")
-    private ItemApreendido itemApreendido;
+    private LocalDateTime horarioAlteracao;
     @ManyToOne
     private Usuario usuario;
 }

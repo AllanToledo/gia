@@ -1,20 +1,17 @@
 package com.allantoledo.gia.views.gestor.crudOrganizacoes;
 
 import com.allantoledo.gia.data.entity.CategoriaItem;
-import com.allantoledo.gia.data.entity.Deposito;
 import com.allantoledo.gia.data.entity.Endereco;
 import com.allantoledo.gia.data.entity.OrgaoDestino;
 import com.allantoledo.gia.data.external.ConsumeEnderecoApi;
 import com.allantoledo.gia.data.external.EnderecoApi;
 import com.allantoledo.gia.data.service.CategoriaItemService;
-import com.allantoledo.gia.data.service.DepositoService;
 import com.allantoledo.gia.data.service.EnderecoService;
 import com.allantoledo.gia.data.service.OrgaoDestinoService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
@@ -35,8 +32,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.Objects;
 import java.util.Set;
 
-@PageTitle("Depositos")
-@Route(value = "cadastrardeposito", layout = MainLayout.class)
+@PageTitle("Organizações")
+@Route(value = "organizacoes/update", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParameter<Long> {
@@ -139,7 +136,7 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
             cidadeField.clear();
             estadoField.clear();
 
-            if (organizacaoCadastrada != null) UI.getCurrent().getPage().getHistory().back();
+            UI.getCurrent().getPage().getHistory().back();
         });
 
         ConfirmDialog dialog = new ConfirmDialog();
@@ -207,7 +204,7 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
         });
 
         setMaxWidth("16cm");
-        add(new H3("Cadastrar Deposito"));
+        add(new H3("Cadastrar Organização de Destino"));
         add(depositoForm);
         add(new H4("Endereço"));
         add(enderecoForm);

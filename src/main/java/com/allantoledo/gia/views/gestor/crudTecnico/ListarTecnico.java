@@ -6,13 +6,13 @@ import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -27,7 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @PageTitle("Tecnicos")
-@Route(value = "listartecnico", layout = MainLayout.class)
+@Route(value = "tecnicos", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarTecnico extends VerticalLayout{
@@ -83,7 +83,7 @@ public class ListarTecnico extends VerticalLayout{
         searchButton.addClickListener(buttonClickEvent -> {
             results.setItems(
                     usuarioService.list(resultsPage,
-                        UsuarioService.UsuarioSpecification.filterByName(searchField.getValue()))
+                        UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
                             .stream()
             );
         });
@@ -93,8 +93,16 @@ public class ListarTecnico extends VerticalLayout{
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("10cm", 3));
         formLayout.setColspan(searchField, 2);
 
+        Button criarNovoUsuario = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovoUsuario.addClickListener(buttonClickEvent -> {
+            criarNovoUsuario.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class));
+        });
+
+        HorizontalLayout header = new HorizontalLayout();
+        header.add(new H3("Pesquisar Tecnicos"), criarNovoUsuario);
+        header.setAlignItems(Alignment.CENTER);
         setMaxWidth("16cm");
-        add(new H3("Pesquisar Tecnicos"));
+        add(header);
         add(formLayout);
         add(results);
     }

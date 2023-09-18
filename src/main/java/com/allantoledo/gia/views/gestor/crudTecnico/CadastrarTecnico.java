@@ -10,6 +10,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.html.H3;
@@ -27,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @PageTitle("Tecnicos")
-@Route(value = "cadastrartecnico", layout = MainLayout.class)
+@Route(value = "tecnicos/update", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<Long> {
@@ -38,7 +39,7 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
 
     Validator validator;
 
-    Usuario tecnicoCadastrado;
+    Usuario usuarioCadastrado;
 
     public CadastrarTecnico(UsuarioService usuarioService,
                             PasswordEncoder passwordEncoder,
@@ -51,7 +52,7 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Long parameter) {
         if (parameter != null) {
-            tecnicoCadastrado = usuarioService.get(parameter).orElse(null);
+            usuarioCadastrado = usuarioService.get(parameter).orElse(null);
         }
         carregarTela();
     }
@@ -62,6 +63,11 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
         TextField cpfField = new TextField("CPF (Somente números)");
         TextField senhaField = new TextField("SENHA");
         Button ativadoButton = new Button("ATIVADO");
+        Select<Usuario.Role> roleSelect = new Select<>();
+        roleSelect.setLabel("NIVEL DE ACESSO");
+        roleSelect.setValue(Usuario.Role.TECNICO);
+        roleSelect.setItems(Usuario.Role.values());
+
         AtomicBoolean usuarioAtivado = new AtomicBoolean(true);
         ativadoButton.addClickListener(buttonClickEvent -> {
             usuarioAtivado.set(!usuarioAtivado.get());
@@ -70,11 +76,12 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
         senhaField.setReadOnly(true);
         senhaField.setValue(gerarSenhaAleatoria());
 
-        if (tecnicoCadastrado != null) {
-            nomeCompletoField.setValue(tecnicoCadastrado.getNome());
-            cpfField.setValue(tecnicoCadastrado.getCpf());
+        if (usuarioCadastrado != null) {
+            nomeCompletoField.setValue(usuarioCadastrado.getNome());
+            cpfField.setValue(usuarioCadastrado.getCpf());
             senhaField.setValue("");
-            usuarioAtivado.set(!tecnicoCadastrado.getAtivado());
+            roleSelect.setValue(usuarioCadastrado.getRole());
+            usuarioAtivado.set(!usuarioCadastrado.getAtivado());
             ativadoButton.click();
         }
 
@@ -83,38 +90,38 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
             cpfField.clear();
             nomeCompletoField.clear();
             senhaField.setValue(gerarSenhaAleatoria());
-            if(tecnicoCadastrado != null) UI.getCurrent().getPage().getHistory().back();
+            roleSelect.clear();
+            UI.getCurrent().getPage().getHistory().back();
         });
 
-        Button cadastrar = new Button(tecnicoCadastrado != null ? "ATUALIZAR" : "CADASTRAR");
+        Button cadastrar = new Button(usuarioCadastrado != null ? "ATUALIZAR" : "CADASTRAR");
         cadastrar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cadastrar.addClickListener((buttonClickEvent) -> {
-            Usuario novoTecnico;
+            Usuario novoUsuario;
 
-            novoTecnico = Objects.requireNonNullElseGet(tecnicoCadastrado, Usuario::new);
-            novoTecnico.setAtivado(usuarioAtivado.get());
-            novoTecnico.setNome(nomeCompletoField.getValue());
-            novoTecnico.setCpf(cpfField.getValue().replaceAll("[^0-9]", ""));
+            novoUsuario = Objects.requireNonNullElseGet(usuarioCadastrado, Usuario::new);
+            novoUsuario.setAtivado(usuarioAtivado.get());
+            novoUsuario.setNome(nomeCompletoField.getValue());
+            novoUsuario.setCpf(cpfField.getValue().replaceAll("[^0-9]", ""));
+            novoUsuario.setRole(roleSelect.getValue());
+            if(usuarioCadastrado == null)
+                novoUsuario.setSenhaCriptografada(passwordEncoder.encode(senhaField.getValue()));
 
-            if(tecnicoCadastrado == null)
-                novoTecnico.setSenhaCriptografada(passwordEncoder.encode(senhaField.getValue()));
-
-            novoTecnico.setRole(Usuario.Role.TECNICO);
-            Set<ConstraintViolation<Usuario>> violations = validator.validate(novoTecnico);
+            Set<ConstraintViolation<Usuario>> violations = validator.validate(novoUsuario);
             for (var violation : violations) {
                 Notification.show(violation.getMessage());
             }
             if (!violations.isEmpty()) return;
-            usuarioService.update(novoTecnico);
-            if(tecnicoCadastrado != null){
-                Notification.show("Técnico atualizado com sucesso");
+            usuarioService.update(novoUsuario);
+            if(usuarioCadastrado != null){
+                Notification.show("Usuário atualizado com sucesso");
             } else {
-                Notification.show("Técnico cadastrado com sucesso");
+                Notification.show("Usuário cadastrado com sucesso");
             }
             cancelar.click();
         });
 
-        formLayout.add(nomeCompletoField, cpfField, senhaField, ativadoButton);
+        formLayout.add(nomeCompletoField, cpfField, senhaField, ativadoButton, roleSelect);
         formLayout.setResponsiveSteps(
                 new ResponsiveStep("0", 1),
                 new ResponsiveStep("10cm", 2),

@@ -1,6 +1,7 @@
 package com.allantoledo.gia.data.entity;
 
 import com.allantoledo.gia.validations.ValidCpfOrCnpj;
+import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Data
-public class Deposito {
+public class Deposito implements Comparable<Deposito> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,4 +25,9 @@ public class Deposito {
     private Endereco endereco;
     @ManyToMany(fetch=FetchType.EAGER)
     private Set<CategoriaItem> categoriasAceitas;
+
+    @Override
+    public int compareTo(@NotNull Deposito o) {
+        return nome.compareTo(o.nome);
+    }
 }

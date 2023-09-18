@@ -15,10 +15,18 @@ public class UsuarioService {
 
     public static class UsuarioSpecification {
         public static final String NOME = "nome";
+        public static final String ROLE = "role";
         private UsuarioSpecification() {}
-        public static Specification<Usuario> filterByName(String nome) {
+        public static Specification<Usuario> filterTecnicoByName(String nome) {
             return Specification.where(nomeLike(nome));
         }
+
+        private static Specification<Usuario> roleIs(Usuario.Role role) {
+            return ((root, query, cb) -> role == null ?
+                    cb.conjunction() :
+                    cb.equal(root.get(ROLE), role));
+        }
+
         private static Specification<Usuario> nomeLike(String nome) {
             return ((root, query, cb) -> nome == null || nome.isEmpty() ?
                     cb.conjunction() :
