@@ -4,9 +4,7 @@ import com.allantoledo.gia.data.converter.JpaConverterJson;
 import com.allantoledo.gia.validations.NullOrCpfValid;
 import com.allantoledo.gia.validations.ValidCpf;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.ToString;
 
@@ -26,11 +24,13 @@ public class ItemApreendido{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(min=1, max=10, message = "Número de processo precisa ser entre 1 e 10 caracteres")
+    @Pattern(regexp = "[0-9]{1,10}", message = "Número do processo deve contar apenas digitos")
     private String numeroProcesso;
     @NotNull(message = "Precisa ser selecionado a data de apreensão")
+    @PastOrPresent
     private LocalDate dataApreensao;
-    @DecimalMin(value = "0")
-    private BigDecimal valorAvaliado;
+    @DecimalMin(value = "0", message = "Não é permitido valores negativos.")
+    private BigDecimal valorAvaliado = BigDecimal.ZERO;
 
     @Convert(converter = JpaConverterJson.class)
     @Column(columnDefinition = "text")
@@ -46,6 +46,7 @@ public class ItemApreendido{
     @ManyToOne()
     private OrgaoDestino orgaoDestino;
     @ManyToOne()
+    @NotNull
     private OrgaoApreensor orgaoApreensor;
 
     @ToString.Exclude

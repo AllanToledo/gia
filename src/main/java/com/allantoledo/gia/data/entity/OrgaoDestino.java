@@ -26,7 +26,6 @@ public class OrgaoDestino implements Comparable<OrgaoDestino> {
     private Endereco endereco;
     @ManyToMany(fetch=FetchType.EAGER)
     private Set<CategoriaItem> categoriasAceitas;
-
     @Override
     public int compareTo(@NotNull OrgaoDestino o) {
         return nome.compareTo(o.nome);

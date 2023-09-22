@@ -4,13 +4,16 @@ import com.allantoledo.gia.data.entity.*;
 import com.allantoledo.gia.data.service.*;
 import com.allantoledo.gia.security.AuthenticatedUser;
 import com.allantoledo.gia.views.MainLayout;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
@@ -31,6 +34,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -118,29 +122,29 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
     void carregarTela() {
         inicializado = true;
         TextField numeroProcessoField = new TextField("NUMERO DO PROCESSO");
+        numeroProcessoField.setHelperText("Número do processo onde foi efetuado a apreensão do objeto.");
         DatePicker dataApreensaoPicker = new DatePicker("DATA APREENSÃO");
         BigDecimalField valorAvaliadoField = new BigDecimalField("VALOR AVALIADO");
+        valorAvaliadoField.setHelperText("Valor avaliado pode ser em branco, mas não pode ser negativo.");
         valorAvaliadoField.setPrefixComponent(new Div(new Text("R$")));
 
-        TextField cpfProprietario = new TextField("CPF DO PROPRIETARIO");
-        Select<ItemApreendido.EstadoDoObjeto> estadoDoObjetoSelect = new Select<>();
-        estadoDoObjetoSelect.setLabel("ESTADO DO OBJETO");
-        estadoDoObjetoSelect.setItems(ItemApreendido.EstadoDoObjeto.values());
-        estadoDoObjetoSelect.setItemLabelGenerator(item -> item.name().replaceAll("_", " "));
+        TextField cpfProprietario = new TextField("CPF DO PROPRIETARIO (APENAS OS DIGITOS)");
+        cpfProprietario.setHelperText("Se não for identificado, o campo deve ficar em branco.");
 
-        Select<OrgaoApreensor> orgaoApreensorSelect = new Select<>();
+        ComboBox<OrgaoApreensor> orgaoApreensorSelect = new ComboBox<>();
         orgaoApreensorSelect.setLabel("ORGAO APREENSOR");
         orgaoApreensorSelect.setItems(orgaoApreensorService.list(Pageable.unpaged()).stream().sorted().toList());
         orgaoApreensorSelect.setItemLabelGenerator(OrgaoApreensor::getNome);
+        orgaoApreensorSelect.setHelperText("Selecione a organização responsavel pela apreensão.");
 
-        Select<OrgaoDestino> orgaoDestinoSelect = new Select<>();
+        ComboBox<OrgaoDestino> orgaoDestinoSelect = new ComboBox<>();
         orgaoDestinoSelect.setLabel("ORGANIZACAO DE DESTINO");
-        orgaoDestinoSelect.setItems(orgaoDestinoService.list(Pageable.unpaged()).stream().sorted().toList());
+        orgaoDestinoSelect.setHelperText("Deve ficar em branco caso o objeto esteja em depósito ou foi reconstituido.");
         orgaoDestinoSelect.setItemLabelGenerator(OrgaoDestino::getNome);
 
-        Select<Deposito> depositoSelect = new Select<>();
+        ComboBox<Deposito> depositoSelect = new ComboBox<>();
         depositoSelect.setLabel("DEPOSITO");
-        depositoSelect.setItems(depositoService.list(Pageable.unpaged()).stream().sorted().toList());
+        depositoSelect.setHelperText("Preencha caso o item esteja em algum depósito.");
         depositoSelect.setItemLabelGenerator(Deposito::getNome);
 
         MultiSelectComboBox<CategoriaItem> categoriaItemSelect = new MultiSelectComboBox<>();
@@ -152,6 +156,24 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
         classeProcessoSelect.setLabel("CLASSE DO PROCESSO");
         classeProcessoSelect.setItems(classeProcessoService.list(Pageable.unpaged()).stream().sorted().toList());
         classeProcessoSelect.setItemLabelGenerator(ClasseProcesso::getNomeClasse);
+
+        Select<ItemApreendido.EstadoDoObjeto> estadoDoObjetoSelect = new Select<>();
+        estadoDoObjetoSelect.setLabel("ESTADO DO OBJETO");
+        estadoDoObjetoSelect.setItems(ItemApreendido.EstadoDoObjeto.values());
+        estadoDoObjetoSelect.addValueChangeListener(selectEstadoDoObjetoComponentValueChangeEvent -> {
+            if(estadoDoObjetoSelect.getValue() == ItemApreendido.EstadoDoObjeto.EM_DEPOSITO){
+                depositoSelect.setItems(depositoService.list(Pageable.unpaged()).stream().sorted().toList());
+                orgaoDestinoSelect.clear();
+            } else if(estadoDoObjetoSelect.getValue() != ItemApreendido.EstadoDoObjeto.RECONSTITUIDO){
+                orgaoDestinoSelect.setItems(orgaoDestinoService.list(Pageable.unpaged()).stream().sorted().toList());
+                depositoSelect.clear();
+            } else {
+                depositoSelect.clear();
+                orgaoDestinoSelect.clear();
+            }
+        });
+        estadoDoObjetoSelect.setItemLabelGenerator(item -> item.name().replaceAll("_", " "));
+
 
         if (itemApreendidoCadastrado != null) {
             numeroProcessoField.setValue(itemApreendidoCadastrado.getNumeroProcesso());
@@ -169,9 +191,9 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
         FormLayout formLayout = new FormLayout();
         formLayout.add(numeroProcessoField, dataApreensaoPicker,
                 valorAvaliadoField, cpfProprietario,
+                categoriaItemSelect, classeProcessoSelect,
                 estadoDoObjetoSelect, orgaoApreensorSelect,
-                orgaoDestinoSelect, depositoSelect,
-                categoriaItemSelect, classeProcessoSelect);
+                orgaoDestinoSelect, depositoSelect);
 
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
@@ -195,7 +217,7 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
         Button cancelar = new Button("CANCELAR");
         cancelar.addThemeVariants(ButtonVariant.LUMO_ERROR);
         cancelar.addClickListener(buttonClickEvent -> {
-            cancelar.getUI().ifPresent(ui -> ui.getPage().getHistory().back());
+            this.getUI().ifPresent(ui -> ui.getPage().getHistory().back());
         });
 
         Button cadastrar = new Button("CADASTRAR");
@@ -248,7 +270,7 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
             if (itemApreendidoCadastrado == null) {
                 Notification.show("Item Apreendido cadastrado com sucesso!");
             } else {
-                Notification.show("Item Apreendido atualziado com sucesso!");
+                Notification.show("Item Apreendido atualizado com sucesso!");
             }
 
             cancelar.click();
@@ -258,10 +280,20 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
         buttonsLayout.setWidthFull();
         buttonsLayout.setJustifyContentMode(JustifyContentMode.END);
 
+        VerticalLayout ajudaContent = new VerticalLayout();
+        ajudaContent.add(new Text("As propriedades servem para adicionar um campo ao formulário" +
+                " que pode ser especifico a um tipo de item, como por exemplo: um item que é da marca Ferrari, " +
+                "onde a chave do campo é \"Marca\" e o valor do campo é \"Ferrari\".\nPode adicionar quantas propriedades forem necessárias."));
+        VerticalLayout exemploLayout = new VerticalLayout();
+        criarCampoExemplo(exemploLayout, Pair.of("Marca", "Ferrari"));
+        ajudaContent.add(exemploLayout);
+        Details ajuda = new Details("Ajuda", ajudaContent);
+
         setMaxWidth("16cm");
         add(new H3("Cadastrar Item Apreendido"));
         add(formLayout);
         add(new H4("Propriedades"));
+        add(ajuda);
         add(descricaoLayout);
         add(adicionarCampo);
         add(buttonsLayout);
@@ -305,5 +337,20 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
             for (var descricaoForm : descricaoForms)
                 descricaoLayout.add(descricaoForm);
         });
+    }
+
+    private static void criarCampoExemplo(VerticalLayout descricaoLayout, Map.Entry<String, String> entry) {
+        FormLayout descricaoItem = new FormLayout();
+        TextField chave = new TextField();
+        chave.setPlaceholder("CHAVE");
+        TextField valor = new TextField();
+        valor.setPlaceholder("VALOR");
+        if (entry != null) {
+            chave.setValue(entry.getKey());
+            valor.setValue(entry.getValue());
+        }
+        descricaoItem.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
+        descricaoItem.add(chave, valor);
+        descricaoLayout.add(descricaoItem);
     }
 }

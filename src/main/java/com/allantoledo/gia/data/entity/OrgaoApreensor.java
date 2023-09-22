@@ -18,7 +18,6 @@ public class OrgaoApreensor implements Comparable<OrgaoApreensor> {
     private Long id;
     @Size(max=80)
     private String nome;
-
     @Override
     public int compareTo(@NotNull OrgaoApreensor o) {
         return nome.compareTo(o.nome);
