@@ -1,11 +1,12 @@
-INSERT INTO usuario (ativado, cpf, nome, role, senha_criptografada)
-VALUES(TRUE, '12345678911','Allan Toledo', 'TECNICO','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
-ON CONFLICT DO NOTHING;
+-- INSERT INTO usuario (ativado, cpf, nome, role, senha_criptografada)
+-- VALUES(TRUE, '12345678911','Allan Toledo', 'TECNICO','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
+-- ON CONFLICT DO NOTHING;
 
 INSERT INTO usuario (ativado, cpf, nome, role, senha_criptografada)
-VALUES(TRUE, '98765432199','Allan Toledo', 'GESTOR','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
+VALUES(TRUE, '05272853156','Allan Toledo', 'GESTOR','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
 ON CONFLICT DO NOTHING;
 
+/*
 INSERT INTO categoria_item(nome_categoria)
 VALUES('MOTOCICLETA'),('CARRO'),('DIPOSITIVO ELETRONICO'),('MOEDA'),('AERONAVES'),
       ('ANIMAIS'), ('ROUPAS'), ('ALIMENTOS PERECIVEIS'), ('ALIMENTOS'), ('FERRAMENTAS'),
@@ -16,3 +17,4 @@ VALUES('TRAFICO'),('CONTRABANDO'),('FURTO'),('ROUBO'),('CRIMES AMBIENTAIS'),('FA
 
 INSERT INTO orgao_apreensor(nome)
 VALUES('POLICIA CIVIL'),('POLICIA MILITAR'),('POLICIA RODOVIARIA FEDERAL'),('POLICIA FEDERAL'),('IBAMA');
+*/
