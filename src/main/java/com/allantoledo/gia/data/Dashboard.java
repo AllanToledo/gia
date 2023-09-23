@@ -23,7 +23,6 @@ public class Dashboard {
     }
 
     public int countItensApreendidosNoAno(String ano) {
-
         try {
             connection = getConnection();
             String sql = "SELECT count(*) FROM item_apreendido WHERE EXTRACT('Year' FROM data_apreensao) = ?";

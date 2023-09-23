@@ -3,7 +3,10 @@ package com.allantoledo.gia.views;
 import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.security.AuthenticatedUser;
 import com.allantoledo.gia.views.anonimo.dashboard.DashboardView;
+import com.allantoledo.gia.views.gestor.crudCategorias.GerenciarCategorias;
+import com.allantoledo.gia.views.gestor.crudClasses.GerenciarClasses;
 import com.allantoledo.gia.views.gestor.crudOrganizacoes.ListarOrgaosDestino;
+import com.allantoledo.gia.views.gestor.crudOrganizacoesApreensores.GerenciarApreensores;
 import com.allantoledo.gia.views.gestor.crudTecnico.CadastrarTecnico;
 import com.allantoledo.gia.views.gestor.crudDeposito.ListarDeposito;
 import com.allantoledo.gia.views.gestor.crudTecnico.ListarTecnico;
@@ -130,6 +133,9 @@ public class MainLayout extends AppLayout {
             nav.addItem(new SideNavItem("Tecnicos", ListarTecnico.class, LineAwesomeIcon.USER.create()));
             nav.addItem(new SideNavItem("Depositos", ListarDeposito.class, LineAwesomeIcon.WAREHOUSE_SOLID.create()));
             nav.addItem(new SideNavItem("Organizações", ListarOrgaosDestino.class, LineAwesomeIcon.BUILDING.create()));
+            nav.addItem(new SideNavItem("Categorias", GerenciarCategorias.class, LineAwesomeIcon.LIST_SOLID.create()));
+            nav.addItem(new SideNavItem("Classes", GerenciarClasses.class, LineAwesomeIcon.LIST_SOLID.create()));
+            nav.addItem(new SideNavItem("Organizações Apreensores", GerenciarApreensores.class, LineAwesomeIcon.GAVEL_SOLID.create()));
         }
 
         if(accessChecker.hasAccess(CadastrarItemApreendido.class)){

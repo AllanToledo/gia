@@ -3,7 +3,7 @@
 -- ON CONFLICT DO NOTHING;
 
 INSERT INTO usuario (ativado, cpf, nome, role, senha_criptografada)
-VALUES(TRUE, '05272853156','Allan Toledo', 'GESTOR','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
+VALUES(TRUE, '12312312312','ADMIN', 'GESTOR','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe')
 ON CONFLICT DO NOTHING;
 
 /*

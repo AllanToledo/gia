@@ -1,7 +1,9 @@
-package com.allantoledo.gia.views.gestor.crudCategorias;
+package com.allantoledo.gia.views.gestor.crudOrganizacoesApreensores;
 
 import com.allantoledo.gia.data.entity.CategoriaItem;
+import com.allantoledo.gia.data.entity.OrgaoApreensor;
 import com.allantoledo.gia.data.service.CategoriaItemService;
+import com.allantoledo.gia.data.service.OrgaoApreensorService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
@@ -17,29 +19,29 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.Pageable;
 
-@PageTitle("Gerenciar Categorias")
-@Route(value = "categorias", layout = MainLayout.class)
+@PageTitle("Gerenciar Organizações Apreensores")
+@Route(value = "apreensores", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class GerenciarCategorias extends VerticalLayout {
+public class GerenciarApreensores extends VerticalLayout {
 
-    CategoriaItemService categoriaItemService;
+    OrgaoApreensorService orgaoApreensorService;
 
-    GerenciarCategorias(CategoriaItemService categoriaItemService){
-        this.categoriaItemService = categoriaItemService;
+    GerenciarApreensores(OrgaoApreensorService orgaoApreensorService){
+        this.orgaoApreensorService = orgaoApreensorService;
 
-        Grid<CategoriaItem> categoriaItemGrid = new Grid<>(CategoriaItem.class);
-        categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
-        categoriaItemGrid.setColumns("id", "nomeCategoria");
-        categoriaItemGrid.addComponentColumn(categoriaItem -> {
+        Grid<OrgaoApreensor> orgaoApreensorGrid = new Grid<>(OrgaoApreensor.class);
+        orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
+        orgaoApreensorGrid.setColumns("id", "nome");
+        orgaoApreensorGrid.addComponentColumn(categoriaItem -> {
             Icon icon = new Icon("lumo", "cross");
             Button button = new Button(icon);
             button.addClickListener(buttonClickEvent -> {
                 try {
-                    categoriaItemService.delete(categoriaItem.getId());
-                    categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
+                    orgaoApreensorService.delete(categoriaItem.getId());
+                    orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
                 } catch (Exception e) {
-                    Notification.show("Não foi possível excluir a categoria");
+                    Notification.show("Não foi possível excluir o orgão apreensor");
                 }
             });
             return button;
@@ -50,20 +52,20 @@ public class GerenciarCategorias extends VerticalLayout {
         Button adicionarButton = new Button("Adicionar");
         adicionarButton.addClickListener(buttonClickEvent -> {
             try {
-                var categoriaItem = new CategoriaItem();
-                categoriaItem.setNomeCategoria(nomeField.getValue().toUpperCase());
-                categoriaItemService.update(categoriaItem);
-                categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
+                var orgaoApreensor = new OrgaoApreensor();
+                orgaoApreensor.setNome(nomeField.getValue().toUpperCase());
+                orgaoApreensorService.update(orgaoApreensor);
+                orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
                 nomeField.clear();
             } catch (Exception e) {
-                Notification.show("Não foi possível salvar a categoria");
+                Notification.show("Não foi possível salvar o orgão apreensor");
             }
         });
         formLayout.add(nomeField, adicionarButton);
 
         setMaxWidth("16cm");
-        add(new H3("Gerenciar Categorias"));
+        add(new H3("Gerenciar Organizações Apreensores"));
         add(formLayout);
-        add(categoriaItemGrid);
+        add(orgaoApreensorGrid);
     }
 }

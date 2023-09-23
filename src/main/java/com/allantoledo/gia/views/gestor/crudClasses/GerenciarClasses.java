@@ -1,7 +1,9 @@
-package com.allantoledo.gia.views.gestor.crudCategorias;
+package com.allantoledo.gia.views.gestor.crudClasses;
 
 import com.allantoledo.gia.data.entity.CategoriaItem;
+import com.allantoledo.gia.data.entity.ClasseProcesso;
 import com.allantoledo.gia.data.service.CategoriaItemService;
+import com.allantoledo.gia.data.service.ClasseProcessoService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
@@ -18,28 +20,28 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.Pageable;
 
 @PageTitle("Gerenciar Categorias")
-@Route(value = "categorias", layout = MainLayout.class)
+@Route(value = "classes", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class GerenciarCategorias extends VerticalLayout {
+public class GerenciarClasses extends VerticalLayout {
 
-    CategoriaItemService categoriaItemService;
+    ClasseProcessoService classeProcessoService;
 
-    GerenciarCategorias(CategoriaItemService categoriaItemService){
-        this.categoriaItemService = categoriaItemService;
+    GerenciarClasses(ClasseProcessoService classeProcessoService){
+        this.classeProcessoService = classeProcessoService;
 
-        Grid<CategoriaItem> categoriaItemGrid = new Grid<>(CategoriaItem.class);
-        categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
-        categoriaItemGrid.setColumns("id", "nomeCategoria");
-        categoriaItemGrid.addComponentColumn(categoriaItem -> {
+        Grid<ClasseProcesso> classeProcessoGrid = new Grid<>(ClasseProcesso.class);
+        classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
+        classeProcessoGrid.setColumns("id", "nomeClasse");
+        classeProcessoGrid.addComponentColumn(categoriaItem -> {
             Icon icon = new Icon("lumo", "cross");
             Button button = new Button(icon);
             button.addClickListener(buttonClickEvent -> {
                 try {
-                    categoriaItemService.delete(categoriaItem.getId());
-                    categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
+                    classeProcessoService.delete(categoriaItem.getId());
+                    classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
                 } catch (Exception e) {
-                    Notification.show("Não foi possível excluir a categoria");
+                    Notification.show("Não foi possível excluir a classe");
                 }
             });
             return button;
@@ -50,20 +52,20 @@ public class GerenciarCategorias extends VerticalLayout {
         Button adicionarButton = new Button("Adicionar");
         adicionarButton.addClickListener(buttonClickEvent -> {
             try {
-                var categoriaItem = new CategoriaItem();
-                categoriaItem.setNomeCategoria(nomeField.getValue().toUpperCase());
-                categoriaItemService.update(categoriaItem);
-                categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
+                var classeProcesso = new ClasseProcesso();
+                classeProcesso.setNomeClasse(nomeField.getValue().toUpperCase());
+                classeProcessoService.update(classeProcesso);
+                classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
                 nomeField.clear();
             } catch (Exception e) {
-                Notification.show("Não foi possível salvar a categoria");
+                Notification.show("Não foi possível salvar a classe");
             }
         });
         formLayout.add(nomeField, adicionarButton);
 
         setMaxWidth("16cm");
-        add(new H3("Gerenciar Categorias"));
+        add(new H3("Gerenciar Classes de Processo"));
         add(formLayout);
-        add(categoriaItemGrid);
+        add(classeProcessoGrid);
     }
 }
