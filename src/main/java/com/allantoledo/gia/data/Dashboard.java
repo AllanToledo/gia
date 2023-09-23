@@ -1,7 +1,5 @@
 package com.allantoledo.gia.data;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -40,16 +38,16 @@ public class Dashboard {
     public BigDecimal sumValorDosItensApreendidosNoAno(String ano) {
         try {
             connection = getConnection();
-            String sql = "SELECT sum(valor_avaliado) FROM item_apreendido WHERE EXTRACT('Year' FROM data_apreensao) = ?";
+            String sql = "SELECT coalesce(sum(valor_avaliado), 0) as sum FROM item_apreendido WHERE EXTRACT('Year' FROM data_apreensao) = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, Integer.parseInt(ano));
             ResultSet rs = statement.executeQuery();
             if (rs.next()) return rs.getBigDecimal("sum");
             connection.close();
         } catch (Exception e) {
-            return new BigDecimal("0.00");
+            return BigDecimal.ZERO;
         }
-        return new BigDecimal("0.00");
+        return BigDecimal.ZERO;
     }
 
     public String categoriaComMaisApreensoes(String ano) {
