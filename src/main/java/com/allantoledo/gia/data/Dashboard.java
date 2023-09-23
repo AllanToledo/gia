@@ -46,7 +46,7 @@ public class Dashboard {
             ResultSet rs = statement.executeQuery();
             if (rs.next()) return rs.getBigDecimal("sum");
             connection.close();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return BigDecimal.ZERO;
         }
         return BigDecimal.ZERO;
