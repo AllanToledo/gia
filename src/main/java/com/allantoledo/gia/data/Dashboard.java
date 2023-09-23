@@ -47,9 +47,9 @@ public class Dashboard {
             if (rs.next()) return rs.getBigDecimal("sum");
             connection.close();
         } catch (Exception e) {
-            return BigDecimal.ZERO;
+            return new BigDecimal("0.00");
         }
-        return BigDecimal.ZERO;
+        return new BigDecimal("0.00");
     }
 
     public String categoriaComMaisApreensoes(String ano) {
