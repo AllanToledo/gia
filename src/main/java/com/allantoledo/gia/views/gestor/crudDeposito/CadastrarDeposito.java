@@ -98,10 +98,10 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
             if (cepField.getValue().length() != 8) return;
             EnderecoApi enderecoApi = consumeEnderecoApi.loadCep(cepField.getValue());
             if(enderecoApi == null) return;
-            logradouroField.setValue(enderecoApi.logradouro());
-            bairroField.setValue(enderecoApi.bairro());
-            cidadeField.setValue(enderecoApi.localidade());
-            estadoField.setValue(enderecoApi.uf());
+            logradouroField.setValue(Objects.requireNonNullElseGet(enderecoApi.logradouro(), logradouroField::getValue));
+            bairroField.setValue(Objects.requireNonNullElseGet(enderecoApi.bairro(), bairroField::getValue));
+            cidadeField.setValue(Objects.requireNonNullElseGet(enderecoApi.localidade(), cidadeField::getValue));
+            estadoField.setValue(Objects.requireNonNullElseGet(enderecoApi.uf(), estadoField::getValue));
         });
 
         FormLayout enderecoForm = new FormLayout();
