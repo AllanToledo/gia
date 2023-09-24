@@ -15,7 +15,14 @@ public class ConsumeEnderecoApi {
 
     public EnderecoApi loadCep(String cep) {
         try {
-            return restTemplate.getForObject("https://viacep.com.br/ws/" + cep + "/json", EnderecoApi.class);
+            var response = restTemplate.getForObject("https://viacep.com.br/ws/" + cep + "/json", EnderecoApi.class);
+            assert(response != null);
+            assert response.cep() != null;
+            assert response.logradouro() != null;
+            assert response.bairro() != null;
+            assert response.localidade() != null;
+            assert response.uf() != null;
+            return response;
         } catch(RestClientException e) {
             return EnderecoApi.EMPTY;
         }
