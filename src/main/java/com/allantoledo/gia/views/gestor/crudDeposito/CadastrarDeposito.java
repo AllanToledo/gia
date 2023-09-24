@@ -97,6 +97,7 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
             cepField.setValue(cepField.getValue().replaceAll("[^0-9]", ""));
             if (cepField.getValue().length() != 8) return;
             EnderecoApi enderecoApi = consumeEnderecoApi.loadCep(cepField.getValue());
+            if(enderecoApi == null) return;
             logradouroField.setValue(enderecoApi.logradouro());
             bairroField.setValue(enderecoApi.bairro());
             cidadeField.setValue(enderecoApi.localidade());
