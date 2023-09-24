@@ -36,7 +36,7 @@ import java.time.format.DateTimeFormatter;
 @RolesAllowed("TECNICO")
 @Uses(Icon.class)
 public class ListarItemsApreendidos extends VerticalLayout {
-    ItemApreendidoService itemApreendidoService;
+    final ItemApreendidoService itemApreendidoService;
 
     private String formatCpf(String cpf) {
         if (cpf == null) return "";
@@ -76,9 +76,7 @@ public class ListarItemsApreendidos extends VerticalLayout {
                     infoLayout.add(new Div(new Text("Item Avaliado em " + currencyFormat(itemApreendido.getValorAvaliado()))));
 
                 Button editar = new Button("EDITAR");
-                editar.addClickListener(buttonClickEvent -> {
-                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class, itemApreendido.getId()));
-                });
+                editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class, itemApreendido.getId())));
                 cardLayout.add(infoLayout, editar);
                 return cardLayout;
             });
@@ -95,13 +93,11 @@ public class ListarItemsApreendidos extends VerticalLayout {
         searchField.setPlaceholder("Pesquisar por processo");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> {
-            results.setItems(
-                    itemApreendidoService.list(resultsPage,
-                                    ItemApreendidoService.ItemApreendidoSpecification.filterByProcess(searchField.getValue()))
-                            .stream()
-            );
-        });
+        searchButton.addClickListener(buttonClickEvent -> results.setItems(
+                itemApreendidoService.list(resultsPage,
+                                ItemApreendidoService.ItemApreendidoSpecification.filterByProcess(searchField.getValue()))
+                        .stream()
+        ));
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -109,9 +105,7 @@ public class ListarItemsApreendidos extends VerticalLayout {
         formLayout.setColspan(searchField, 2);
 
         Button criarNovoDeposito = new Button(new Icon(VaadinIcon.PLUS));
-        criarNovoDeposito.addClickListener(buttonClickEvent -> {
-            criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class));
-        });
+        criarNovoDeposito.addClickListener(buttonClickEvent -> criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class)));
 
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Apreensões"), criarNovoDeposito);

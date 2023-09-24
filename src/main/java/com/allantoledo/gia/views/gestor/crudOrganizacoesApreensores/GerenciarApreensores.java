@@ -1,8 +1,6 @@
 package com.allantoledo.gia.views.gestor.crudOrganizacoesApreensores;
 
-import com.allantoledo.gia.data.entity.CategoriaItem;
 import com.allantoledo.gia.data.entity.OrgaoApreensor;
-import com.allantoledo.gia.data.service.CategoriaItemService;
 import com.allantoledo.gia.data.service.OrgaoApreensorService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
@@ -25,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 @Uses(Icon.class)
 public class GerenciarApreensores extends VerticalLayout {
 
-    OrgaoApreensorService orgaoApreensorService;
+    final OrgaoApreensorService orgaoApreensorService;
 
     GerenciarApreensores(OrgaoApreensorService orgaoApreensorService){
         this.orgaoApreensorService = orgaoApreensorService;

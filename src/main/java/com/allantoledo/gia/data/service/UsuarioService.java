@@ -21,12 +21,6 @@ public class UsuarioService {
             return Specification.where(nomeLike(nome));
         }
 
-        private static Specification<Usuario> roleIs(Usuario.Role role) {
-            return ((root, query, cb) -> role == null ?
-                    cb.conjunction() :
-                    cb.equal(root.get(ROLE), role));
-        }
-
         private static Specification<Usuario> nomeLike(String nome) {
             return ((root, query, cb) -> nome == null || nome.isEmpty() ?
                     cb.conjunction() :
@@ -44,8 +38,8 @@ public class UsuarioService {
         return repository.findById(id);
     }
 
-    public Usuario update(Usuario entity) {
-        return repository.save(entity);
+    public void update(Usuario entity) {
+        repository.save(entity);
     }
 
     public void delete(Long id) {

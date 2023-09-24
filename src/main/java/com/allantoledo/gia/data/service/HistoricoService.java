@@ -21,8 +21,8 @@ public class HistoricoService {
         return historicoRepository.findById(id);
     }
 
-    public Historico update(Historico entity){
-        return historicoRepository.save(entity);
+    public void update(Historico entity){
+        historicoRepository.save(entity);
     }
 
     public void delete(Long id){

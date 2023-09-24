@@ -1,7 +1,5 @@
 package com.allantoledo.gia.data.external;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -9,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class ConsumeEnderecoApi {
 
-    RestTemplate restTemplate;
+    final RestTemplate restTemplate;
 
     public ConsumeEnderecoApi(RestTemplate restTemplate){
         this.restTemplate = restTemplate;

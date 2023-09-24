@@ -31,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarOrgaosDestino extends VerticalLayout{
-    OrgaoDestinoService orgaoDestinoService;
+    final OrgaoDestinoService orgaoDestinoService;
 
     private String formatCpf(String cpfOrCnpj){
         if(cpfOrCnpj.length() > 11) return cpfOrCnpj;
@@ -58,9 +58,7 @@ public class ListarOrgaosDestino extends VerticalLayout{
                 dados.add(new Div(new Text(formatCpf(orgaoDestino.getCpfCnpj()))));
                 dados.add(new Div(new Text(orgaoDestino.getContato())));
                 Button editar = new Button("EDITAR");
-                editar.addClickListener(buttonClickEvent -> {
-                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class, orgaoDestino.getId()));
-                });
+                editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class, orgaoDestino.getId())));
                 infoLayout.add(dados);
                 cardLayout.add(infoLayout, editar);
                 return cardLayout;
@@ -78,13 +76,11 @@ public class ListarOrgaosDestino extends VerticalLayout{
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> {
-            results.setItems(
-                    orgaoDestinoService.list(resultsPage,
-                                    OrgaoDestinoService.OrgaoDestinoSpecification.filterByName(searchField.getValue()))
-                            .stream()
-            );
-        });
+        searchButton.addClickListener(buttonClickEvent -> results.setItems(
+                orgaoDestinoService.list(resultsPage,
+                                OrgaoDestinoService.OrgaoDestinoSpecification.filterByName(searchField.getValue()))
+                        .stream()
+        ));
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -92,9 +88,7 @@ public class ListarOrgaosDestino extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovaOrganizacao = new Button(new Icon(VaadinIcon.PLUS));
-        criarNovaOrganizacao.addClickListener(buttonClickEvent -> {
-            criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class));
-        });
+        criarNovaOrganizacao.addClickListener(buttonClickEvent -> criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class)));
 
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Organizações de Destino"), criarNovaOrganizacao);

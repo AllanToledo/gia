@@ -1,6 +1,5 @@
 package com.allantoledo.gia.data.service;
 
-import com.allantoledo.gia.data.entity.Deposito;
 import com.allantoledo.gia.data.entity.ItemApreendido;
 import com.allantoledo.gia.data.repository.ItemApreendidoRepository;
 import org.springframework.data.domain.Page;
@@ -36,8 +35,8 @@ public class ItemApreendidoService {
         return itemApreendidoRepository.findById(id);
     }
 
-    public ItemApreendido update(ItemApreendido entity) {
-        return itemApreendidoRepository.save(entity);
+    public void update(ItemApreendido entity) {
+        itemApreendidoRepository.save(entity);
     }
 
     public void delete(Long id) {

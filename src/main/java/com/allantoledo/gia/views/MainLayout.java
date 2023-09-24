@@ -37,7 +37,7 @@ public class MainLayout extends AppLayout {
     private H3 viewTitle;
 
     private final AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
+    private final AccessAnnotationChecker accessChecker;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
@@ -89,12 +89,8 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
-            userName.getSubMenu().addItem("Desconectar", e -> {
-                authenticatedUser.logout();
-            });
-            userName.getSubMenu().addItem("Perfil", e -> {
-                UI.getCurrent().navigate(Perfil.class);
-            });
+            userName.getSubMenu().addItem("Desconectar", e -> authenticatedUser.logout());
+            userName.getSubMenu().addItem("Perfil", e -> UI.getCurrent().navigate(Perfil.class));
             layout.add(userMenu);
         }
         return layout;

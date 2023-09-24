@@ -37,12 +37,12 @@ import java.util.Set;
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParameter<Long> {
-    OrgaoDestinoService orgaoDestinoService;
-    EnderecoService enderecoService;
-    CategoriaItemService categoriaItemService;
-    Validator validator;
+    final OrgaoDestinoService orgaoDestinoService;
+    final EnderecoService enderecoService;
+    final CategoriaItemService categoriaItemService;
+    final Validator validator;
     OrgaoDestino organizacaoCadastrada;
-    ConsumeEnderecoApi consumeEnderecoApi;
+    final ConsumeEnderecoApi consumeEnderecoApi;
 
     CadastrarOrgaoDestino(OrgaoDestinoService orgaoDestinoService,
                           EnderecoService enderecoService,
@@ -154,9 +154,7 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
 
         Button deletar = new Button("Deletar");
         deletar.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deletar.addClickListener(buttonClickEvent -> {
-            dialog.open();
-        });
+        deletar.addClickListener(buttonClickEvent -> dialog.open());
 
         Button cadastrar = new Button("Cadastrar");
         cadastrar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

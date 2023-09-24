@@ -31,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarTecnico extends VerticalLayout{
-    UsuarioService usuarioService;
+    final UsuarioService usuarioService;
 
     private String formatCpf(String cpf){
         return cpf.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
@@ -60,9 +60,7 @@ public class ListarTecnico extends VerticalLayout{
                 dados.add(new Div(new Text(usuario.getRole().toString())));
                 dados.add(new Div(new Text(usuario.getAtivado()? "ATIVO" : "DESATIVADO")));
                 Button editar = new Button("EDITAR");
-                editar.addClickListener(buttonClickEvent -> {
-                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class, usuario.getId()));
-                });
+                editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class, usuario.getId())));
                 infoLayout.add(dados);
                 cardLayout.add(infoLayout, editar);
                 return cardLayout;
@@ -80,13 +78,11 @@ public class ListarTecnico extends VerticalLayout{
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> {
-            results.setItems(
-                    usuarioService.list(resultsPage,
-                        UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
-                            .stream()
-            );
-        });
+        searchButton.addClickListener(buttonClickEvent -> results.setItems(
+                usuarioService.list(resultsPage,
+                    UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
+                        .stream()
+        ));
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -94,9 +90,7 @@ public class ListarTecnico extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovoUsuario = new Button(new Icon(VaadinIcon.PLUS));
-        criarNovoUsuario.addClickListener(buttonClickEvent -> {
-            criarNovoUsuario.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class));
-        });
+        criarNovoUsuario.addClickListener(buttonClickEvent -> criarNovoUsuario.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class)));
 
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Tecnicos"), criarNovoUsuario);

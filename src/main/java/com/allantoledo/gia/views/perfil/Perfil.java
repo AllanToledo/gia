@@ -30,13 +30,13 @@ import java.util.Set;
 @Uses(Icon.class)
 public class Perfil extends VerticalLayout {
 
-    UsuarioService usuarioService;
+    final UsuarioService usuarioService;
 
-    PasswordEncoder passwordEncoder;
+    final PasswordEncoder passwordEncoder;
 
-    Validator validator;
+    final Validator validator;
 
-    AuthenticatedUser authenticatedUser;
+    final AuthenticatedUser authenticatedUser;
 
     public Perfil(UsuarioService usuarioService,
                   PasswordEncoder passwordEncoder,

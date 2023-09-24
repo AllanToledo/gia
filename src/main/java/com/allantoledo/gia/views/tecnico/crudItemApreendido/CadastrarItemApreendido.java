@@ -4,7 +4,6 @@ import com.allantoledo.gia.data.entity.*;
 import com.allantoledo.gia.data.service.*;
 import com.allantoledo.gia.security.AuthenticatedUser;
 import com.allantoledo.gia.views.MainLayout;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -204,9 +203,7 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
         List<HorizontalLayout> descricaoForms = new LinkedList<>();
         Button adicionarCampo = new Button("ADICIONAR CAMPO");
         adicionarCampo.setWidthFull();
-        adicionarCampo.addClickListener(buttonClickEvent -> {
-            criarCampo(descricaoLayout, descricaoForms, null);
-        });
+        adicionarCampo.addClickListener(buttonClickEvent -> criarCampo(descricaoLayout, descricaoForms, null));
 
         if (itemApreendidoCadastrado != null && itemApreendidoCadastrado.getDescricao() != null) {
             for (var entry : itemApreendidoCadastrado.getDescricao().entrySet()) {
@@ -216,9 +213,7 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
 
         Button cancelar = new Button("CANCELAR");
         cancelar.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        cancelar.addClickListener(buttonClickEvent -> {
-            this.getUI().ifPresent(ui -> ui.getPage().getHistory().back());
-        });
+        cancelar.addClickListener(buttonClickEvent -> this.getUI().ifPresent(ui -> ui.getPage().getHistory().back()));
 
         Button cadastrar = new Button("CADASTRAR");
         cadastrar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

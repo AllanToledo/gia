@@ -1,24 +1,19 @@
 package com.allantoledo.gia.data.service;
 
-import com.allantoledo.gia.data.entity.CategoriaItem;
 import com.allantoledo.gia.data.entity.OrgaoDestino;
-import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.data.repository.OrgaoDestinoRepository;
-import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class OrgaoDestinoService {
 
     public static class OrgaoDestinoSpecification {
         public static final String NOME = "nome";
-        public static final String CATEGORIAS_ACEITAS = "categoriasAceitas";
         private OrgaoDestinoSpecification() {}
         public static Specification<OrgaoDestino> filterByName(String nome) {
             return Specification.where(nomeLike(nome));
@@ -40,8 +35,8 @@ public class OrgaoDestinoService {
         return orgaoDestinoRepository.findById(id);
     }
 
-    public OrgaoDestino update(OrgaoDestino entity) {
-        return orgaoDestinoRepository.save(entity);
+    public void update(OrgaoDestino entity) {
+        orgaoDestinoRepository.save(entity);
     }
 
     public void delete(Long id) {

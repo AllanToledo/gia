@@ -1,8 +1,6 @@
 package com.allantoledo.gia.views.gestor.crudClasses;
 
-import com.allantoledo.gia.data.entity.CategoriaItem;
 import com.allantoledo.gia.data.entity.ClasseProcesso;
-import com.allantoledo.gia.data.service.CategoriaItemService;
 import com.allantoledo.gia.data.service.ClasseProcessoService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
@@ -25,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 @Uses(Icon.class)
 public class GerenciarClasses extends VerticalLayout {
 
-    ClasseProcessoService classeProcessoService;
+    final ClasseProcessoService classeProcessoService;
 
     GerenciarClasses(ClasseProcessoService classeProcessoService){
         this.classeProcessoService = classeProcessoService;

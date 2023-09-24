@@ -3,10 +3,6 @@ package com.allantoledo.gia.views.anonimo.dashboard;
 import com.allantoledo.gia.data.Dashboard;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,7 +21,7 @@ import java.text.NumberFormat;
 @AnonymousAllowed
 public class DashboardView extends VerticalLayout {
 
-    Dashboard dashboard;
+    final Dashboard dashboard;
 
     public DashboardView(Dashboard dashboard) {
         setWidthFull();

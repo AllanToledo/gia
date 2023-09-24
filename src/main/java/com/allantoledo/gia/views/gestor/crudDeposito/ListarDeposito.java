@@ -3,7 +3,6 @@ package com.allantoledo.gia.views.gestor.crudDeposito;
 import com.allantoledo.gia.data.entity.Deposito;
 import com.allantoledo.gia.data.service.DepositoService;
 import com.allantoledo.gia.views.MainLayout;
-import com.allantoledo.gia.views.gestor.crudDeposito.CadastrarDeposito;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -32,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarDeposito extends VerticalLayout{
-    DepositoService depositoService;
+    final DepositoService depositoService;
 
     private String formatCpf(String cpfOrCnpj){
         if(cpfOrCnpj.length() > 11) return cpfOrCnpj;
@@ -61,9 +60,7 @@ public class ListarDeposito extends VerticalLayout{
                 dados.add(new Div(new Text(formatCpf(deposito.getCpfCnpj()))));
                 dados.add(new Div(new Text(deposito.getContato())));
                 Button editar = new Button("EDITAR");
-                editar.addClickListener(buttonClickEvent -> {
-                    editar.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class, deposito.getId()));
-                });
+                editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class, deposito.getId())));
                 infoLayout.add(dados);
                 cardLayout.add(infoLayout, editar);
                 return cardLayout;
@@ -81,13 +78,11 @@ public class ListarDeposito extends VerticalLayout{
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> {
-            results.setItems(
-                    depositoService.list(resultsPage,
-                                    DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
-                            .stream()
-            );
-        });
+        searchButton.addClickListener(buttonClickEvent -> results.setItems(
+                depositoService.list(resultsPage,
+                                DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
+                        .stream()
+        ));
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -95,9 +90,7 @@ public class ListarDeposito extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovoDeposito = new Button(new Icon(VaadinIcon.PLUS));
-        criarNovoDeposito.addClickListener(buttonClickEvent -> {
-            criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class));
-        });
+        criarNovoDeposito.addClickListener(buttonClickEvent -> criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class)));
 
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Depósitos"), criarNovoDeposito);

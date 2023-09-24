@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 @Uses(Icon.class)
 public class GerenciarCategorias extends VerticalLayout {
 
-    CategoriaItemService categoriaItemService;
+    final CategoriaItemService categoriaItemService;
 
     GerenciarCategorias(CategoriaItemService categoriaItemService){
         this.categoriaItemService = categoriaItemService;

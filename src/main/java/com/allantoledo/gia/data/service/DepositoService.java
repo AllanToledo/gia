@@ -34,8 +34,8 @@ public class DepositoService {
         return depositoRepository.findById(id);
     }
 
-    public Deposito update(Deposito entity) {
-        return depositoRepository.save(entity);
+    public void update(Deposito entity) {
+        depositoRepository.save(entity);
     }
 
     public void delete(Long id) {

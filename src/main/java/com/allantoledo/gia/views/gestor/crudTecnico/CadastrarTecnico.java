@@ -33,11 +33,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Uses(Icon.class)
 public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<Long> {
 
-    UsuarioService usuarioService;
+    final UsuarioService usuarioService;
 
-    PasswordEncoder passwordEncoder;
+    final PasswordEncoder passwordEncoder;
 
-    Validator validator;
+    final Validator validator;
 
     Usuario usuarioCadastrado;
 

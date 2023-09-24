@@ -17,9 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.HashMap;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,6 +37,7 @@ public class ItemApreendidoRepositoryIntegrationTest {
         }
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void whenInsertMap_thenFindTheSameMap() {
         ItemApreendido itemApreendido = new ItemApreendido();
@@ -48,7 +47,7 @@ public class ItemApreendidoRepositoryIntegrationTest {
         itemApreendido.getDescricao().put("cor", "preto");
         itemApreendido = itemApreendidoRepository.save(itemApreendido);
 
-        ItemApreendido found = itemApreendidoRepository.findById(itemApreendido.getId()).get();
+        @SuppressWarnings("OptionalGetWithoutIsPresent") ItemApreendido found = itemApreendidoRepository.findById(itemApreendido.getId()).get();
         assertThat(found).isNotNull();
         assertThat(found.getDescricao()).isNotNull();
         assertThat(found.getDescricao().get("cor")).isEqualTo("preto");
