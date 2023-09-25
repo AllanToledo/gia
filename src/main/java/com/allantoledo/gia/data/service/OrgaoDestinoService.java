@@ -11,6 +11,20 @@ import java.util.Optional;
 
 @Service
 public class OrgaoDestinoService {
+
+    public static class OrgaoDestinoSpecification {
+        public static final String NOME = "nome";
+        private OrgaoDestinoSpecification() {}
+        public static Specification<OrgaoDestino> filterByName(String nome) {
+            return Specification.where(nomeLike(nome));
+        }
+        private static Specification<OrgaoDestino> nomeLike(String nome) {
+            return ((root, query, cb) -> nome == null || nome.isEmpty() ?
+                    cb.conjunction() :
+                    cb.like(root.get(NOME), "%" + nome + "%"));
+        }
+    }
+
     private final OrgaoDestinoRepository orgaoDestinoRepository;
 
     public OrgaoDestinoService(OrgaoDestinoRepository orgaoDestinoRepository) {
@@ -21,8 +35,8 @@ public class OrgaoDestinoService {
         return orgaoDestinoRepository.findById(id);
     }
 
-    public OrgaoDestino update(OrgaoDestino entity) {
-        return orgaoDestinoRepository.save(entity);
+    public void update(OrgaoDestino entity) {
+        orgaoDestinoRepository.save(entity);
     }
 
     public void delete(Long id) {

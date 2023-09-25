@@ -20,12 +20,16 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
     public LoginView(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
+
         setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
 
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("Gestão de Itens Apreendidos");
-        i18n.getHeader().setDescription("Login using user/user or admin/admin");
+        i18n.getHeader().setDescription("Entrar com CPF e SENHA");
+        i18n.getForm().setTitle("Entrar");
+        i18n.getForm().setUsername("CPF");
+        i18n.getForm().setPassword("SENHA");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 

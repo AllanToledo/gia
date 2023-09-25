@@ -5,12 +5,12 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.InputMismatchException;
 
-public class CpfValidator implements ConstraintValidator<ValidCpf, String> {
+public class NullOrCpfValidator implements ConstraintValidator<NullOrCpfValid, String> {
 
     @Override
     public boolean isValid(String CPF, ConstraintValidatorContext context) {
+        if(CPF == null || CPF.length() == 0) return true;
 
-        // considera-se erro CPF's formados por uma sequencia de numeros iguais
         if (CPF.equals("00000000000") ||
                 CPF.equals("11111111111") ||
                 CPF.equals("22222222222") || CPF.equals("33333333333") ||

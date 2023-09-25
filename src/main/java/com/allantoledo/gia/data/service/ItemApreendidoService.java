@@ -11,6 +11,20 @@ import java.util.Optional;
 
 @Service
 public class ItemApreendidoService {
+
+    public static class ItemApreendidoSpecification {
+        public static final String PROCESS_NUMBER = "numeroProcesso";
+        private ItemApreendidoSpecification() {}
+        public static Specification<ItemApreendido> filterByProcess(String numeroProcesso) {
+            return Specification.where(numberProcessEquals(numeroProcesso));
+        }
+        private static Specification<ItemApreendido> numberProcessEquals(String numeroProcesso) {
+            return ((root, query, cb) -> numeroProcesso == null || numeroProcesso.isEmpty() ?
+                    cb.conjunction() :
+                    cb.equal(root.get(PROCESS_NUMBER), numeroProcesso));
+        }
+    }
+    
     private final ItemApreendidoRepository itemApreendidoRepository;
 
     public ItemApreendidoService(ItemApreendidoRepository itemApreendidoRepository) {
@@ -21,8 +35,8 @@ public class ItemApreendidoService {
         return itemApreendidoRepository.findById(id);
     }
 
-    public ItemApreendido update(ItemApreendido entity) {
-        return itemApreendidoRepository.save(entity);
+    public void update(ItemApreendido entity) {
+        itemApreendidoRepository.save(entity);
     }
 
     public void delete(Long id) {

@@ -21,8 +21,8 @@ public class OrgaoApreensorService {
         return orgaoApreensorRepository.findById(id);
     }
 
-    public OrgaoApreensor update(OrgaoApreensor entity) {
-        return orgaoApreensorRepository.save(entity);
+    public void update(OrgaoApreensor entity) {
+        orgaoApreensorRepository.save(entity);
     }
 
     public void delete(Long id) {

@@ -22,8 +22,8 @@ public class ClasseProcessoService {
         return classeProcessoRepository.findById(id);
     }
 
-    public ClasseProcesso update(ClasseProcesso entity) {
-        return classeProcessoRepository.save(entity);
+    public void update(ClasseProcesso entity) {
+        classeProcessoRepository.save(entity);
     }
 
     public void delete(Long id) {

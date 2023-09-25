@@ -21,8 +21,8 @@ public class CategoriaItemService {
         return categoriaItemRepository.findById(id);
     }
 
-    public CategoriaItem update(CategoriaItem entity) {
-        return categoriaItemRepository.save(entity);
+    public void update(CategoriaItem entity) {
+        categoriaItemRepository.save(entity);
     }
 
     public void delete(Long id) {
