@@ -1,6 +1,6 @@
 package com.allantoledo.gia.data.entity;
 
-import com.allantoledo.gia.validations.ValidCpfOrCnpj;
+import com.allantoledo.gia.data.validations.ValidCpfOrCnpj;
 import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

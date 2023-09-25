@@ -1,4 +1,4 @@
-package com.allantoledo.gia.validations;
+package com.allantoledo.gia.data.validations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

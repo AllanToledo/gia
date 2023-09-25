@@ -1,4 +1,4 @@
-package com.allantoledo.gia.validations;
+package com.allantoledo.gia.data.validations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,12 +10,12 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = CpfValidator.class)
+@Constraint(validatedBy = CpfCnpjValidator.class)
 @Target({ METHOD, CONSTRUCTOR, FIELD })
 @Retention(RUNTIME)
 @Documented
-public @interface ValidCpf {
-    String message() default "CPF inválido";
+public @interface ValidCpfOrCnpj {
+    String message() default "CPF ou CNPJ inválido";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

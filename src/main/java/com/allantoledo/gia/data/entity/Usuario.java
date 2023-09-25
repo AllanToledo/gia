@@ -1,6 +1,6 @@
 package com.allantoledo.gia.data.entity;
 
-import com.allantoledo.gia.validations.ValidCpf;
+import com.allantoledo.gia.data.validations.ValidCpf;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

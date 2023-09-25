@@ -66,9 +66,12 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
 
     public void carregarTela() {
         TextField nomeField = new TextField("NOME DA ORGANIZAÇÃO DE DESTINO");
-        TextField contatoField = new TextField("CONTATO");
-        TextField cpfCnpjField = new TextField("CPF/CNPJ");
-
+        TextField contatoField = new TextField("CONTATO (Email ou Telefone)");
+        contatoField.setMaxLength(80);
+        TextField cpfCnpjField = new TextField("CPF/CNPJ (Somente números)");
+        cpfCnpjField.setMaxLength(14);
+        cpfCnpjField.setPattern("[0-9]{11,14}");
+        cpfCnpjField.setAllowedCharPattern("[0-9]");
         MultiSelectComboBox<CategoriaItem> categoriasDeItemAceitas = new MultiSelectComboBox<>(
                 "CATEGORIAS DE ITEMS ACEITAS");
         categoriasDeItemAceitas.setItems(categoriaItemService.list(Pageable.unpaged()).stream().toList());
@@ -82,6 +85,9 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
         depositoForm.setColspan(nomeField, 2);
 
         TextField cepField = new TextField("CEP (Somente os números)");
+        cepField.setMaxLength(8);
+        cepField.setPattern("[0-9]{8}");
+        cepField.setAllowedCharPattern("[0-9]");
         TextField logradouroField = new TextField("LOGRADOURO");
         TextField numeroField = new TextField("NUMERO");
         TextField bairroField = new TextField("BAIRRO");
