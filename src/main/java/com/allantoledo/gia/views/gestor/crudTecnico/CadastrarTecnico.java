@@ -61,6 +61,12 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
         FormLayout formLayout = new FormLayout();
         TextField nomeCompletoField = new TextField("NOME COMPLETO");
         TextField cpfField = new TextField("CPF (Somente números)");
+        cpfField.setMaxLength(14);
+        cpfField.setAllowedCharPattern("[0-9]");
+        cpfField.addValueChangeListener(ignored -> {
+            String content = cpfField.getValue().replaceAll("[^0-9]", "").replaceAll("(\\d{0,11}).*", "$1");
+            cpfField.setValue(content.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4"));
+        });
         TextField senhaField = new TextField("SENHA");
         Button ativadoButton = new Button("ATIVADO");
         Select<Usuario.Role> roleSelect = new Select<>();

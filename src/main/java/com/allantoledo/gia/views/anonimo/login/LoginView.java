@@ -30,6 +30,13 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         i18n.getForm().setTitle("Entrar");
         i18n.getForm().setUsername("CPF");
         i18n.getForm().setPassword("SENHA");
+        i18n.getForm().setSubmit("Entrar");
+        i18n.getErrorMessage().setTitle("CPF ou SENHA inválidos");
+        i18n.getErrorMessage()
+                .setMessage("Verifique se o CPF e a SENHA estão corretos e tente novamente.");
+        i18n.getErrorMessage().setPassword("Senha Não Pode Ser Vazia");
+        i18n.getErrorMessage().setUsername("CPF Não Pode Ser Vazio");
+
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 

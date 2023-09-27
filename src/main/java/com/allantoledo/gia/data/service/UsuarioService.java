@@ -24,7 +24,7 @@ public class UsuarioService {
         private static Specification<Usuario> nomeLike(String nome) {
             return ((root, query, cb) -> nome == null || nome.isEmpty() ?
                     cb.conjunction() :
-                    cb.like(root.get(NOME), "%" + nome + "%"));
+                    cb.like(cb.lower(root.get(NOME)), "%" + nome.toLowerCase() + "%"));
         }
     }
 

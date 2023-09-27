@@ -1,1 +1,5 @@
 @import url('./main-layout.css');
+
+html {
+    --lumo-primary-color: hsl(216, 35%, 15%);
+}

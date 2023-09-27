@@ -29,9 +29,10 @@ public class ItemApreendido{
     @Pattern(regexp = "[0-9]{1,10}", message = "Número do processo deve contar apenas digitos")
     private String numeroProcesso;
     @NotNull(message = "Precisa ser selecionado a data de apreensão")
-    @PastOrPresent
+    @PastOrPresent(message = "Data de apreensão não pode ser no futuro")
     private LocalDate dataApreensao;
     @DecimalMin(value = "0", message = "Não é permitido valores negativos.")
+    @DecimalMax(value = "100000000", message = "Valor não pode ser maior que 100 milhões")
     private BigDecimal valorAvaliado = BigDecimal.ZERO;
 
     @Convert(converter = JpaConverterJson.class)
@@ -48,7 +49,7 @@ public class ItemApreendido{
     @ManyToOne()
     private OrgaoDestino orgaoDestino;
     @ManyToOne()
-    @NotNull
+    @NotNull(message = "Selecione um orgão apreensor")
     private OrgaoApreensor orgaoApreensor;
 
     @ToString.Exclude
@@ -57,8 +58,10 @@ public class ItemApreendido{
     private Set<Historico> historicos;
 
     @ManyToMany(fetch=FetchType.EAGER)
+    @Size(min=1, message = "Selecione pelo menos uma categoria")
     private Set<CategoriaItem> categorias;
     @ManyToMany(fetch=FetchType.EAGER)
+    @Size(min=1, message = "Selecione pelo menos uma classe")
     private Set<ClasseProcesso> classes;
 
     public enum EstadoDoObjeto {

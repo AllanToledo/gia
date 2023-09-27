@@ -3,6 +3,7 @@ package com.allantoledo.gia.data.entity;
 import com.allantoledo.gia.data.validations.ValidCpfOrCnpj;
 import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -15,13 +16,14 @@ import java.util.Set;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Deposito implements Comparable<Deposito> {
+public class Deposito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(max=80)
+    @Size(max=80, message = "Nome do deposito não deve exceder 80 caracteres")
     private String nome;
-    @Size(max=80)
+    @Size(max=11, message = "Contato não deve exceder 11 caracteres")
+    @Pattern(regexp = "[0-9]{10,11}", message = "Contato deve conter entre 10 e 11 digitos")
     private String contato;
     @ValidCpfOrCnpj
     private String cpfCnpj;
@@ -29,12 +31,9 @@ public class Deposito implements Comparable<Deposito> {
     @OneToOne
     private Endereco endereco;
     @ManyToMany(fetch=FetchType.EAGER)
+    @Size(min=1, message = "Selecione pelo menos uma categoria")
     private Set<CategoriaItem> categoriasAceitas;
 
-    @Override
-    public int compareTo(@NotNull Deposito o) {
-        return nome.compareTo(o.nome);
-    }
 
     @Override
     public final boolean equals(Object o) {

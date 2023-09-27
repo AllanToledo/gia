@@ -20,6 +20,8 @@ public class Historico{
     private String estadoAnterior;
     @Column(columnDefinition = "text")
     private String estadoNovo;
+    @Column(columnDefinition = "text")
+    private String diferenca;
     private LocalDateTime horarioAlteracao;
     @ManyToOne
     private Usuario usuario;

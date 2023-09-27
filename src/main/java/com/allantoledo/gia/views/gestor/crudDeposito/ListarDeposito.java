@@ -26,7 +26,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@PageTitle("Depositos")
+@PageTitle("Depósitos")
 @Route(value = "depositos", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
@@ -73,6 +73,8 @@ public class ListarDeposito extends VerticalLayout{
         results.setRenderer(resultCardRenderer);
 
         Pageable resultsPage = PageRequest.of(0, 10);
+
+        results.setItems(depositoService.list(Pageable.unpaged()).toList());
         FormLayout formLayout = new FormLayout();
         TextField searchField = new TextField();
         searchField.setPlaceholder("Pesquisar por nome");
@@ -90,6 +92,7 @@ public class ListarDeposito extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovoDeposito = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovoDeposito.setTooltipText("Criar novo depósito");
         criarNovoDeposito.addClickListener(buttonClickEvent -> criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class)));
 
         HorizontalLayout header = new HorizontalLayout();

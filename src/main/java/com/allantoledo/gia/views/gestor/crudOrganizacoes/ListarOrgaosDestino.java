@@ -70,6 +70,7 @@ public class ListarOrgaosDestino extends VerticalLayout{
         VirtualList<OrgaoDestino> results = new VirtualList<>();
         results.setRenderer(resultCardRenderer);
 
+        results.setItems(orgaoDestinoService.list(Pageable.unpaged()).toList());
         Pageable resultsPage = PageRequest.of(0, 10);
         FormLayout formLayout = new FormLayout();
         TextField searchField = new TextField();
@@ -88,6 +89,7 @@ public class ListarOrgaosDestino extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovaOrganizacao = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovaOrganizacao.setTooltipText("Criar nova organização");
         criarNovaOrganizacao.addClickListener(buttonClickEvent -> criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class)));
 
         HorizontalLayout header = new HorizontalLayout();

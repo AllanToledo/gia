@@ -16,22 +16,22 @@ public class Endereco {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(max=80)
+    @Size(max=80, message = "Logradouro não deve exceder 80 caracteres")
     @Column(columnDefinition = "varchar(80) default ''")
     private String logradouro;
-    @Size(max=80)
+    @Size(max=80, message = "Bairro não deve exceder 80 caracteres")
     @Column(columnDefinition = "varchar(80) default ''")
     private String bairro;
-    @Size(max=80)
+    @Size(max=80, message = "Cidade não deve exceder 80 caracteres")
     @Column(columnDefinition = "varchar(80) default ''")
     private String cidade;
-    @Size(max=2)
+    @Size(max=2, message = "Estado não deve exceder 2 caracteres")
     @Column(columnDefinition = "varchar(2) default ''")
     private String estado;
-    @Size(max=8)
+    @Size(max=8, message = "CEP não deve exceder 8 caracteres")
     @Column(columnDefinition = "varchar(8) default ''")
     private String cep;
-    @Size(max=10)
+    @Size(max=10, message = "Número não deve exceder 10 caracteres")
     @Column(columnDefinition = "varchar(10) default ''")
     private String numero;
 

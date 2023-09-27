@@ -86,8 +86,11 @@ public class ListarItemsApreendidos extends VerticalLayout {
         this.itemApreendidoService = itemApreendidoService;
         VirtualList<ItemApreendido> results = new VirtualList<>();
         results.setRenderer(resultCardRenderer);
-
         Pageable resultsPage = PageRequest.of(0, 10);
+        results.setItems(
+                itemApreendidoService.list(resultsPage)
+                        .stream()
+        );
         FormLayout formLayout = new FormLayout();
         TextField searchField = new TextField();
         searchField.setPlaceholder("Pesquisar por processo");
@@ -104,11 +107,12 @@ public class ListarItemsApreendidos extends VerticalLayout {
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("10cm", 3));
         formLayout.setColspan(searchField, 2);
 
-        Button criarNovoDeposito = new Button(new Icon(VaadinIcon.PLUS));
-        criarNovoDeposito.addClickListener(buttonClickEvent -> criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class)));
+        Button criarNovaApreensao = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovaApreensao.setTooltipText("Criar nova apreensão");
+        criarNovaApreensao.addClickListener(buttonClickEvent -> criarNovaApreensao.getUI().ifPresent(ui -> ui.navigate(CadastrarItemApreendido.class)));
 
         HorizontalLayout header = new HorizontalLayout();
-        header.add(new H3("Pesquisar Apreensões"), criarNovoDeposito);
+        header.add(new H3("Pesquisar Apreensões"), criarNovaApreensao);
         header.setAlignItems(Alignment.CENTER);
 
         setMaxWidth("16cm");

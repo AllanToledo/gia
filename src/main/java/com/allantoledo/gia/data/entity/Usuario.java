@@ -27,7 +27,7 @@ public class Usuario {
     @ValidCpf
     private String cpf;
 
-    @Size(min=3, max=80, message = "Tamanho de nome Inválido")
+    @Size(min=3, max=80, message = "Nome do usuário deve ter entre 3 e 80 caracteres")
     private String nome;
 
     @Column(columnDefinition = "boolean default true")

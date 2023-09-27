@@ -26,12 +26,18 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Comparator;
+
 @PageTitle("Tecnicos")
 @Route(value = "tecnicos", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
 public class ListarTecnico extends VerticalLayout{
-    final UsuarioService usuarioService;
+    UsuarioService usuarioService;
+
+    VirtualList<Usuario> results = new VirtualList<>();
+
+    TextField searchField = new TextField();
 
     private String formatCpf(String cpf){
         return cpf.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
@@ -59,29 +65,35 @@ public class ListarTecnico extends VerticalLayout{
                 dados.add(new Div(new Text(formatCpf(usuario.getCpf()))));
                 dados.add(new Div(new Text(usuario.getRole().toString())));
                 dados.add(new Div(new Text(usuario.getAtivado()? "ATIVO" : "DESATIVADO")));
+                Button desativar = new Button(usuario.getAtivado()? "DESATIVAR" : "ATIVAR");
+                desativar.addClickListener(buttonClickEvent -> {
+                    usuario.setAtivado(!usuario.getAtivado());
+                    usuarioService.update(usuario);
+                    results.setItems(usuarioService.list(Pageable.ofSize(10),
+                            UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue())).stream().sorted(Comparator.comparing(Usuario::getNome)));
+                });
                 Button editar = new Button("EDITAR");
                 editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class, usuario.getId())));
                 infoLayout.add(dados);
-                cardLayout.add(infoLayout, editar);
+                cardLayout.add(infoLayout, desativar, editar);
                 return cardLayout;
             });
 
 
     public ListarTecnico(UsuarioService usuarioService){
         this.usuarioService = usuarioService;
-        VirtualList<Usuario> results = new VirtualList<>();
         results.setRenderer(resultCardRenderer);
 
+        results.setItems(usuarioService.list(Pageable.unpaged()).stream().sorted(Comparator.comparing(Usuario::getNome)));
         Pageable resultsPage = PageRequest.of(0, 10);
         FormLayout formLayout = new FormLayout();
-        TextField searchField = new TextField();
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
         searchButton.addClickListener(buttonClickEvent -> results.setItems(
                 usuarioService.list(resultsPage,
                     UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
-                        .stream()
+                        .stream().sorted(Comparator.comparing(Usuario::getNome))
         ));
 
         formLayout.add(searchField, searchButton);
@@ -90,6 +102,7 @@ public class ListarTecnico extends VerticalLayout{
         formLayout.setColspan(searchField, 2);
 
         Button criarNovoUsuario = new Button(new Icon(VaadinIcon.PLUS));
+        criarNovoUsuario.setTooltipText("Criar novo usuario");
         criarNovoUsuario.addClickListener(buttonClickEvent -> criarNovoUsuario.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class)));
 
         HorizontalLayout header = new HorizontalLayout();

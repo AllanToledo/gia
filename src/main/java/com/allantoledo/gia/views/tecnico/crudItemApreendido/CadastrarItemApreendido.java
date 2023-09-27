@@ -14,10 +14,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -95,12 +92,16 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
                 VerticalLayout infoLayout = new VerticalLayout();
                 infoLayout.setSpacing(false);
                 infoLayout.setPadding(false);
-                infoLayout.add(new Div(new H5("ESTADO ANTERIOR")));
-                if (historico.getEstadoAnterior() != null)
-                    infoLayout.add(new Div(new Text(historico.getEstadoAnterior())));
-
-                infoLayout.add(new Div(new H5("ESTADO NOVO")));
-                infoLayout.add(new Div(new Text(historico.getEstadoNovo())));
+//                infoLayout.add(new Div(new H5("ESTADO ANTERIOR")));
+//                if (historico.getEstadoAnterior() != null)
+//                    infoLayout.add(new Div(new Text(historico.getEstadoAnterior())));
+//
+//                infoLayout.add(new Div(new H5("ESTADO NOVO")));
+//                infoLayout.add(new Div(new Text(historico.getEstadoNovo())));
+                infoLayout.add(new Div(new H5("DIFERENCAS")));
+                Paragraph paragraph = new Paragraph(historico.getDiferenca());
+                paragraph.getStyle().set("white-space", "pre-line");
+                infoLayout.add(new Div(paragraph));
                 infoLayout.add(new Div(new H5("USUARIO")));
                 infoLayout.add(new Div(new Text(historico.getUsuario().getNome())));
                 infoLayout.add(new Div(new H5("HORARIO DA ALTERACAO")));
@@ -121,6 +122,8 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
     void carregarTela() {
         inicializado = true;
         TextField numeroProcessoField = new TextField("NUMERO DO PROCESSO");
+        numeroProcessoField.setAllowedCharPattern("[0-9]");
+        numeroProcessoField.setMaxLength(10);
         numeroProcessoField.setHelperText("Número do processo onde foi efetuado a apreensão do objeto.");
         DatePicker dataApreensaoPicker = new DatePicker("DATA APREENSÃO");
         BigDecimalField valorAvaliadoField = new BigDecimalField("VALOR AVALIADO");
@@ -129,44 +132,58 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
 
         TextField cpfProprietario = new TextField("CPF DO PROPRIETARIO (APENAS OS DIGITOS)");
         cpfProprietario.setHelperText("Se não for identificado, o campo deve ficar em branco.");
+        cpfProprietario.setMaxLength(11);
 
         ComboBox<OrgaoApreensor> orgaoApreensorSelect = new ComboBox<>();
         orgaoApreensorSelect.setLabel("ORGAO APREENSOR");
-        orgaoApreensorSelect.setItems(orgaoApreensorService.list(Pageable.unpaged()).stream().sorted().toList());
+        orgaoApreensorSelect.setItems(orgaoApreensorService.list(Pageable.unpaged())
+                .stream().sorted(Comparator.comparing(OrgaoApreensor::getNome)).toList());
         orgaoApreensorSelect.setItemLabelGenerator(OrgaoApreensor::getNome);
         orgaoApreensorSelect.setHelperText("Selecione a organização responsavel pela apreensão.");
 
         ComboBox<OrgaoDestino> orgaoDestinoSelect = new ComboBox<>();
+        orgaoDestinoSelect.setEnabled(false);
         orgaoDestinoSelect.setLabel("ORGANIZACAO DE DESTINO");
         orgaoDestinoSelect.setHelperText("Deve ficar em branco caso o objeto esteja em depósito ou foi reconstituido.");
         orgaoDestinoSelect.setItemLabelGenerator(OrgaoDestino::getNome);
+        orgaoDestinoSelect.setItems(orgaoDestinoService.list(Pageable.unpaged())
+                .stream().sorted(Comparator.comparing(OrgaoDestino::getNome)).toList());
 
         ComboBox<Deposito> depositoSelect = new ComboBox<>();
+        depositoSelect.setEnabled(false);
         depositoSelect.setLabel("DEPOSITO");
         depositoSelect.setHelperText("Preencha caso o item esteja em algum depósito.");
         depositoSelect.setItemLabelGenerator(Deposito::getNome);
+        depositoSelect.setItems(depositoService.list(Pageable.unpaged())
+                .stream().sorted(Comparator.comparing(Deposito::getNome)).toList());
 
         MultiSelectComboBox<CategoriaItem> categoriaItemSelect = new MultiSelectComboBox<>();
         categoriaItemSelect.setLabel("CATEGORIA DO ITEM");
-        categoriaItemSelect.setItems(categoriaItemService.list(Pageable.unpaged()).stream().sorted().toList());
+        categoriaItemSelect.setItems(categoriaItemService.list(Pageable.unpaged())
+                .stream().sorted(Comparator.comparing(CategoriaItem::getNomeCategoria)).toList());
         categoriaItemSelect.setItemLabelGenerator(CategoriaItem::getNomeCategoria);
 
         MultiSelectComboBox<ClasseProcesso> classeProcessoSelect = new MultiSelectComboBox<>();
         classeProcessoSelect.setLabel("CLASSE DO PROCESSO");
-        classeProcessoSelect.setItems(classeProcessoService.list(Pageable.unpaged()).stream().sorted().toList());
+        classeProcessoSelect.setItems(classeProcessoService.list(Pageable.unpaged())
+                .stream().sorted(Comparator.comparing(ClasseProcesso::getNomeClasse)).toList());
         classeProcessoSelect.setItemLabelGenerator(ClasseProcesso::getNomeClasse);
 
         Select<ItemApreendido.EstadoDoObjeto> estadoDoObjetoSelect = new Select<>();
         estadoDoObjetoSelect.setLabel("ESTADO DO OBJETO");
         estadoDoObjetoSelect.setItems(ItemApreendido.EstadoDoObjeto.values());
         estadoDoObjetoSelect.addValueChangeListener(selectEstadoDoObjetoComponentValueChangeEvent -> {
-            if(estadoDoObjetoSelect.getValue() == ItemApreendido.EstadoDoObjeto.EM_DEPOSITO){
-                depositoSelect.setItems(depositoService.list(Pageable.unpaged()).stream().sorted().toList());
+            if (estadoDoObjetoSelect.getValue() == ItemApreendido.EstadoDoObjeto.EM_DEPOSITO) {
                 orgaoDestinoSelect.clear();
-            } else if(estadoDoObjetoSelect.getValue() != ItemApreendido.EstadoDoObjeto.RECONSTITUIDO){
-                orgaoDestinoSelect.setItems(orgaoDestinoService.list(Pageable.unpaged()).stream().sorted().toList());
+                orgaoDestinoSelect.setEnabled(false);
+                depositoSelect.setEnabled(true);
+            } else if (estadoDoObjetoSelect.getValue() != ItemApreendido.EstadoDoObjeto.RECONSTITUIDO) {
                 depositoSelect.clear();
+                depositoSelect.setEnabled(false);
+                orgaoDestinoSelect.setEnabled(true);
             } else {
+                orgaoDestinoSelect.setEnabled(false);
+                depositoSelect.setEnabled(false);
                 depositoSelect.clear();
                 orgaoDestinoSelect.clear();
             }
@@ -255,6 +272,7 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
             historico.setHorarioAlteracao(LocalDateTime.now());
             historico.setEstadoNovo(itemApreendidoNovo.toString());
             historico.setUsuario(usuarioLogado);
+            historico.setDiferenca(gerarDiferencas(historico));
 
             historicoService.update(historico);
             if (itemApreendidoNovo.getHistoricos() == null)
@@ -295,13 +313,58 @@ public class CadastrarItemApreendido extends VerticalLayout implements HasUrlPar
 
         if (itemApreendidoCadastrado == null) return;
 
-        add(new H3("Histórico"));
+        add(new H3("Log"));
 
         VirtualList<Historico> historicoVirtualList = new VirtualList<>();
         historicoVirtualList.setRenderer(historicoComponentRenderer);
         historicoVirtualList.setItems(itemApreendidoCadastrado.getHistoricos());
         add(historicoVirtualList);
 
+    }
+
+    private static String gerarDiferencas(Historico historico) {
+        HashMap<String, String> diferencasMap = new HashMap<>();
+        if (historico.getEstadoAnterior() != null) {
+            ArrayList<String> propriedadesAntigas;
+            propriedadesAntigas = new ArrayList<>(List.of(historico.getEstadoAnterior()
+                    .replaceAll("([a-zA-Z]*)=((\\{[a-zA-Z0-9,-=\\s]*\\})?(\\[[a-zA-Z0-9,-=\\s()]*\\])?([a-zA-Z0-9-=\\s()]*)?),?", "\n$1:$2")
+                    .split("\n")));
+            System.out.println(propriedadesAntigas);
+            for (var line : propriedadesAntigas) {
+                String[] propriedadeAntiga = line.split(":");
+                if (propriedadeAntiga.length == 2) {
+                    String chave = propriedadeAntiga[0];
+                    String valor = propriedadeAntiga[1];
+                    diferencasMap.put(chave, valor);
+                }
+            }
+        }
+
+        ArrayList<String> propriedadesNovas = new ArrayList<>(List.of(historico.getEstadoNovo()
+                .replaceAll("([a-zA-Z]*)=((\\{[a-zA-Z0-9,-=\\s]*\\})?(\\[[a-zA-Z0-9,-=\\s()]*\\])?([a-zA-Z0-9-=\\s()]*)?),?", "\n$1:$2")
+                .split("\n")));
+        System.out.println(propriedadesNovas);
+        StringBuilder diferencas = new StringBuilder();
+        for (var line : propriedadesNovas) {
+            String[] propriedadeNova = line.split(":");
+            if (propriedadeNova.length == 2) {
+                String chave = propriedadeNova[0];
+                String valor = propriedadeNova[1];
+                if (!diferencasMap.containsKey(chave)) {
+                    diferencas.append(chave).append(": ").append(valor).append("\n");
+                } else {
+                    if (!diferencasMap.get(chave).equals(valor)) {
+                        diferencas.append(chave)
+                                .append(": ")
+                                .append(diferencasMap.get(chave))
+                                .append(" -> ")
+                                .append(valor)
+                                .append("\n");
+                    }
+                }
+            }
+        }
+        return diferencas.toString();
     }
 
     private static void criarCampo(VerticalLayout descricaoLayout, List<HorizontalLayout> descricaoForms, Map.Entry<String, String> entry) {

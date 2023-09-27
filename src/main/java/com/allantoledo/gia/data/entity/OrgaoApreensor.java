@@ -2,10 +2,7 @@ package com.allantoledo.gia.data.entity;
 
 
 import com.github.javaparser.quality.NotNull;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -13,20 +10,19 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_nome_apreensor", columnList = "nome", unique = true)
+})
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class OrgaoApreensor implements Comparable<OrgaoApreensor> {
+public class OrgaoApreensor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(max=80)
+    @Size(max=80, message = "Nome do orgão apreensor não deve exceder 80 caracteres")
     private String nome;
-    @Override
-    public int compareTo(@NotNull OrgaoApreensor o) {
-        return nome.compareTo(o.nome);
-    }
 
     @Override
     public final boolean equals(Object o) {

@@ -4,6 +4,8 @@ import com.allantoledo.gia.data.entity.CategoriaItem;
 import com.allantoledo.gia.data.service.CategoriaItemService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -35,12 +37,24 @@ public class GerenciarCategorias extends VerticalLayout {
             Icon icon = new Icon("lumo", "cross");
             Button button = new Button(icon);
             button.addClickListener(buttonClickEvent -> {
-                try {
-                    categoriaItemService.delete(categoriaItem.getId());
-                    categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
-                } catch (Exception e) {
-                    Notification.show("Não foi possível excluir a categoria");
-                }
+                ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setHeader("Deletar " + categoriaItem.getNomeCategoria() + "?");
+                dialog.setText("Essa ação é irreversível e deve ser usada apenas se necessário.");
+                dialog.setCancelable(true);
+                dialog.setCancelText("Cancelar");
+                Button confimarDelete = new Button("DELETAR");
+                confimarDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                confimarDelete.addClickListener(event -> {
+                    try {
+                        categoriaItemService.delete(categoriaItem.getId());
+                        categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
+                    } catch (Exception e) {
+                        Notification.show("Não foi possível excluir a categoria");
+                    }
+                });
+                dialog.setConfirmButton(confimarDelete);
+                dialog.open();
+
             });
             return button;
         });
@@ -51,7 +65,12 @@ public class GerenciarCategorias extends VerticalLayout {
         adicionarButton.addClickListener(buttonClickEvent -> {
             try {
                 var categoriaItem = new CategoriaItem();
-                categoriaItem.setNomeCategoria(nomeField.getValue().toUpperCase());
+                var nome = nomeField.getValue().toUpperCase().trim();
+                if(nome.isEmpty()) {
+                    Notification.show("Nome da categoria não pode ser vazio");
+                    return;
+                }
+                categoriaItem.setNomeCategoria(nome);
                 categoriaItemService.update(categoriaItem);
                 categoriaItemGrid.setItems(categoriaItemService.list(Pageable.unpaged()).toList());
                 nomeField.clear();

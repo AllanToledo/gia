@@ -4,6 +4,8 @@ import com.allantoledo.gia.data.entity.OrgaoApreensor;
 import com.allantoledo.gia.data.service.OrgaoApreensorService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -31,16 +33,27 @@ public class GerenciarApreensores extends VerticalLayout {
         Grid<OrgaoApreensor> orgaoApreensorGrid = new Grid<>(OrgaoApreensor.class);
         orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
         orgaoApreensorGrid.setColumns("id", "nome");
-        orgaoApreensorGrid.addComponentColumn(categoriaItem -> {
+        orgaoApreensorGrid.addComponentColumn(apreensor -> {
             Icon icon = new Icon("lumo", "cross");
             Button button = new Button(icon);
             button.addClickListener(buttonClickEvent -> {
-                try {
-                    orgaoApreensorService.delete(categoriaItem.getId());
-                    orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
-                } catch (Exception e) {
-                    Notification.show("Não foi possível excluir o orgão apreensor");
-                }
+                ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setHeader("Deletar " + apreensor.getNome() + "?");
+                dialog.setText("Essa ação é irreversível e deve ser usada apenas se necessário.");
+                dialog.setCancelable(true);
+                dialog.setCancelText("Cancelar");
+                Button confimarDelete = new Button("DELETAR");
+                confimarDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                confimarDelete.addClickListener(event -> {
+                    try {
+                        orgaoApreensorService.delete(apreensor.getId());
+                        orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
+                    } catch (Exception e) {
+                        Notification.show("Não foi possível excluir o orgão apreensor.");
+                    }
+                });
+                dialog.setConfirmButton(confimarDelete);
+                dialog.open();
             });
             return button;
         });
@@ -51,7 +64,12 @@ public class GerenciarApreensores extends VerticalLayout {
         adicionarButton.addClickListener(buttonClickEvent -> {
             try {
                 var orgaoApreensor = new OrgaoApreensor();
-                orgaoApreensor.setNome(nomeField.getValue().toUpperCase());
+                var nome = nomeField.getValue().toUpperCase().trim();
+                if(nome.isEmpty()) {
+                    Notification.show("Nome do orgão apreensor não pode ser vazio");
+                    return;
+                }
+                orgaoApreensor.setNome(nome);
                 orgaoApreensorService.update(orgaoApreensor);
                 orgaoApreensorGrid.setItems(orgaoApreensorService.list(Pageable.unpaged()).toList());
                 nomeField.clear();

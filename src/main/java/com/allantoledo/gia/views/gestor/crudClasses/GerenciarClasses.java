@@ -4,6 +4,8 @@ import com.allantoledo.gia.data.entity.ClasseProcesso;
 import com.allantoledo.gia.data.service.ClasseProcessoService;
 import com.allantoledo.gia.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -31,16 +33,28 @@ public class GerenciarClasses extends VerticalLayout {
         Grid<ClasseProcesso> classeProcessoGrid = new Grid<>(ClasseProcesso.class);
         classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
         classeProcessoGrid.setColumns("id", "nomeClasse");
-        classeProcessoGrid.addComponentColumn(categoriaItem -> {
+        classeProcessoGrid.addComponentColumn(classeProcesso -> {
             Icon icon = new Icon("lumo", "cross");
             Button button = new Button(icon);
             button.addClickListener(buttonClickEvent -> {
-                try {
-                    classeProcessoService.delete(categoriaItem.getId());
-                    classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
-                } catch (Exception e) {
-                    Notification.show("Não foi possível excluir a classe");
-                }
+                ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setHeader("Deletar " + classeProcesso.getNomeClasse() + "?");
+                dialog.setText("Essa ação é irreversível e deve ser usada apenas se necessário.");
+                dialog.setCancelable(true);
+                dialog.setCancelText("Cancelar");
+                Button confimarDelete = new Button("DELETAR");
+                confimarDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                confimarDelete.addClickListener(event -> {
+                    try {
+                        classeProcessoService.delete(classeProcesso.getId());
+                        classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
+                    } catch (Exception e) {
+                        Notification.show("Não foi possível excluir a classe");
+                    }
+                });
+                dialog.setConfirmButton(confimarDelete);
+                dialog.open();
+
             });
             return button;
         });
@@ -51,7 +65,12 @@ public class GerenciarClasses extends VerticalLayout {
         adicionarButton.addClickListener(buttonClickEvent -> {
             try {
                 var classeProcesso = new ClasseProcesso();
-                classeProcesso.setNomeClasse(nomeField.getValue().toUpperCase());
+                var nome = nomeField.getValue().toUpperCase().trim();
+                if(nome.isEmpty()) {
+                    Notification.show("Nome da classe não pode ser vazio");
+                    return;
+                }
+                classeProcesso.setNomeClasse(nome);
                 classeProcessoService.update(classeProcesso);
                 classeProcessoGrid.setItems(classeProcessoService.list(Pageable.unpaged()).toList());
                 nomeField.clear();

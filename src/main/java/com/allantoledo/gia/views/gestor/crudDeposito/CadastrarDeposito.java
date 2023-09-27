@@ -33,7 +33,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Objects;
 import java.util.Set;
 
-@PageTitle("Depositos")
+@PageTitle("Depósitos")
 @Route(value = "depositos/update", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
@@ -68,12 +68,26 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
 
     public void carregarTela() {
         TextField nomeField = new TextField("NOME DEPÓSITO");
-        TextField contatoField = new TextField("CONTATO (Email ou Telefone)");
-        contatoField.setMaxLength(80);
+        TextField contatoField = new TextField("CONTATO (Somente números)");
+        contatoField.setHelperText("Ex: 65912345678");
+        contatoField.setAllowedCharPattern("[0-9]");
+        contatoField.setMaxLength(15);
+        contatoField.addValueChangeListener(ignored -> contatoField.setValue(contatoField.getValue()
+                .replaceAll("[^0-9]", "")
+                .replaceAll("(\\d{2})(\\d{5})(\\d{0,4}).*", "($1) $2-$3")));
+
         TextField cpfCnpjField = new TextField("CPF/CNPJ (Somente números)");
-        cpfCnpjField.setMaxLength(14);
-        cpfCnpjField.setPattern("[0-9]{11,14}");
+        cpfCnpjField.setMaxLength(18);
         cpfCnpjField.setAllowedCharPattern("[0-9]");
+        cpfCnpjField.addValueChangeListener(ignored -> {
+            String content = cpfCnpjField.getValue().replaceAll("[^0-9]", "").replaceAll("(\\d{0,14}).*", "$1");
+            if(content.length() > 11) {
+                cpfCnpjField.setValue(content.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5"));
+            } else {
+                cpfCnpjField.setValue(content.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4"));
+            }
+        });
+
         Checkbox depositarioFielCheckBox = new Checkbox("DEPOSITÁRIO FIEL");
 
         MultiSelectComboBox<CategoriaItem> categoriasDeItemAceitas = new MultiSelectComboBox<>(
@@ -160,7 +174,12 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
         Button confimarDelete = new Button("DELETAR");
         confimarDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         confimarDelete.addClickListener(event -> {
+            try {
             depositoService.delete(depositoCadastrado.getId());
+            } catch (Exception e) {
+                Notification.show("Não foi possível deletar o depósito, provavelmente possui itens vinculados a ele");
+                return;
+            }
             cancelar.click();
         });
         dialog.setConfirmButton(confimarDelete);
@@ -174,8 +193,8 @@ public class CadastrarDeposito extends VerticalLayout implements HasUrlParameter
         cadastrar.addClickListener(buttonClickEvent -> {
             Deposito depositoNovo = Objects.requireNonNullElseGet(depositoCadastrado, Deposito::new);
             depositoNovo.setNome(nomeField.getValue());
-            depositoNovo.setContato(contatoField.getValue());
-            depositoNovo.setCpfCnpj(cpfCnpjField.getValue());
+            depositoNovo.setContato(contatoField.getValue().replaceAll("[^0-9]", ""));
+            depositoNovo.setCpfCnpj(cpfCnpjField.getValue().replaceAll("[^0-9]", ""));
             depositoNovo.setDepositarioFiel(depositarioFielCheckBox.getValue());
 
             Endereco enderecoDeposito = Objects.requireNonNullElseGet(depositoNovo.getEndereco(), Endereco::new);

@@ -66,12 +66,26 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
 
     public void carregarTela() {
         TextField nomeField = new TextField("NOME DA ORGANIZAÇÃO DE DESTINO");
-        TextField contatoField = new TextField("CONTATO (Email ou Telefone)");
-        contatoField.setMaxLength(80);
+        TextField contatoField = new TextField("CONTATO (Somente números)");
+        contatoField.setHelperText("Ex: 65912345678");
+        contatoField.setAllowedCharPattern("[0-9]");
+        contatoField.setMaxLength(15);
+        contatoField.addValueChangeListener(ignored -> contatoField.setValue(contatoField.getValue()
+                .replaceAll("[^0-9]", "")
+                .replaceAll("(\\d{2})(\\d{5})(\\d{0,4}).*", "($1) $2-$3")));
+
         TextField cpfCnpjField = new TextField("CPF/CNPJ (Somente números)");
-        cpfCnpjField.setMaxLength(14);
-        cpfCnpjField.setPattern("[0-9]{11,14}");
+        cpfCnpjField.setMaxLength(18);
         cpfCnpjField.setAllowedCharPattern("[0-9]");
+        cpfCnpjField.addValueChangeListener(ignored -> {
+           String content = cpfCnpjField.getValue().replaceAll("[^0-9]", "").replaceAll("(\\d{0,14}).*", "$1");
+           if(content.length() > 11) {
+               cpfCnpjField.setValue(content.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5"));
+           } else {
+               cpfCnpjField.setValue(content.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4"));
+           }
+        });
+
         MultiSelectComboBox<CategoriaItem> categoriasDeItemAceitas = new MultiSelectComboBox<>(
                 "CATEGORIAS DE ITEMS ACEITAS");
         categoriasDeItemAceitas.setItems(categoriaItemService.list(Pageable.unpaged()).stream().toList());
@@ -154,9 +168,15 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
         Button confimarDelete = new Button("DELETAR");
         confimarDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         confimarDelete.addClickListener(event -> {
-            orgaoDestinoService.delete(organizacaoCadastrada.getId());
+            try {
+                orgaoDestinoService.delete(organizacaoCadastrada.getId());
+            } catch (Exception e) {
+                Notification.show("Não foi possível deletar a organização, provavelmente possui itens vinculados a ela");
+                return;
+            }
             cancelar.click();
         });
+
         dialog.setConfirmButton(confimarDelete);
 
         Button deletar = new Button("Deletar");
@@ -168,8 +188,8 @@ public class CadastrarOrgaoDestino extends VerticalLayout implements HasUrlParam
         cadastrar.addClickListener(buttonClickEvent -> {
             OrgaoDestino depositoNovo = Objects.requireNonNullElseGet(organizacaoCadastrada, OrgaoDestino::new);
             depositoNovo.setNome(nomeField.getValue());
-            depositoNovo.setContato(contatoField.getValue());
-            depositoNovo.setCpfCnpj(cpfCnpjField.getValue());
+            depositoNovo.setContato(contatoField.getValue().replaceAll("[^0-9]", ""));
+            depositoNovo.setCpfCnpj(cpfCnpjField.getValue().replaceAll("[^0-9]", ""));
 
             Endereco enderecoDeposito = Objects.requireNonNullElseGet(depositoNovo.getEndereco(), Endereco::new);
             enderecoDeposito.setCep(cepField.getValue());
