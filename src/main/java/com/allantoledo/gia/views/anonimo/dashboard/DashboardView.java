@@ -64,17 +64,17 @@ public class DashboardView extends VerticalLayout {
     }
 
     private Component itensDoados() {
-        return createComponente("Quantidade de Itens enviados para doação em 2023",
+        return createComponente("Itens enviados para doação em 2023",
                 dashboard.quantidadeDeItemsDoados("2023") + " itens");
     }
 
     private Component sumValorDosItensApreendidosNoAno() {
-        return createComponente("Soma do valor avaliado em apreensões em 2023",
+        return createComponente("Valor das apreensões em 2023",
                 currencyFormat(dashboard.sumValorDosItensApreendidosNoAno("2023")));
     }
 
     private Component categoriaComMaisApreensoes() {
-        return createComponente("Categoria com mais apreensões em 2023",
+        return createComponente("Principal apreensão em 2023",
                 dashboard.categoriaComMaisApreensoes("2023"));
     }
 

@@ -3,6 +3,7 @@ package com.allantoledo.gia.data.entity;
 import com.allantoledo.gia.data.validations.ValidCpf;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -37,6 +38,7 @@ public class Usuario {
     private String senhaCriptografada;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message="Selecione um nivel acesso")
     private Role role;
 
     public enum Role {
