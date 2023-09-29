@@ -1,8 +1,11 @@
 package com.allantoledo.gia.views.gestor.crudOrganizacoes;
 
 import com.allantoledo.gia.data.entity.OrgaoDestino;
+import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.data.service.OrgaoDestinoService;
+import com.allantoledo.gia.data.service.UsuarioService;
 import com.allantoledo.gia.views.MainLayout;
+import com.allantoledo.gia.views.componentes.PaginationComponent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -26,15 +29,18 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
+
 @PageTitle("Organizações")
 @Route(value = "organizacoes", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class ListarOrgaosDestino extends VerticalLayout{
+public class ListarOrgaosDestino extends VerticalLayout {
     final OrgaoDestinoService orgaoDestinoService;
 
-    private String formatCpf(String cpfOrCnpj){
-        if(cpfOrCnpj.length() > 11) return cpfOrCnpj;
+    private String formatCpf(String cpfOrCnpj) {
+        if (cpfOrCnpj.length() > 11) return cpfOrCnpj;
         return cpfOrCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
     }
 
@@ -65,23 +71,40 @@ public class ListarOrgaosDestino extends VerticalLayout{
             });
 
 
-    public ListarOrgaosDestino(OrgaoDestinoService orgaoDestinoService){
+    public ListarOrgaosDestino(OrgaoDestinoService orgaoDestinoService) {
         this.orgaoDestinoService = orgaoDestinoService;
         VirtualList<OrgaoDestino> results = new VirtualList<>();
+        results.setHeightFull();
         results.setRenderer(resultCardRenderer);
-
         results.setItems(orgaoDestinoService.list(Pageable.unpaged()).toList());
-        Pageable resultsPage = PageRequest.of(0, 10);
+        AtomicReference<Pageable> resultsPage = new AtomicReference<>(PageRequest.of(0, 10));
         FormLayout formLayout = new FormLayout();
+
         TextField searchField = new TextField();
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> results.setItems(
-                orgaoDestinoService.list(resultsPage,
-                                OrgaoDestinoService.OrgaoDestinoSpecification.filterByName(searchField.getValue()))
-                        .stream()
-        ));
+
+        PaginationComponent paginationLayout = new PaginationComponent(resultsPage.get(), (page) -> {
+            resultsPage.set(page);
+            results.setItems(
+                    orgaoDestinoService.list(resultsPage.get(),
+                                    OrgaoDestinoService.OrgaoDestinoSpecification.filterByName(searchField.getValue()))
+                            .stream());
+            return null;
+        });
+
+        searchButton.addClickListener(buttonClickEvent -> {
+            resultsPage.set(PageRequest.of(0, 10));
+            paginationLayout.resetPage(resultsPage.get());
+            results.setItems(
+                    orgaoDestinoService.list(resultsPage.get(),
+                                    OrgaoDestinoService.OrgaoDestinoSpecification.filterByName(searchField.getValue()))
+                            .stream()
+            );
+        });
+
+
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -92,12 +115,16 @@ public class ListarOrgaosDestino extends VerticalLayout{
         criarNovaOrganizacao.setTooltipText("Criar nova organização");
         criarNovaOrganizacao.addClickListener(buttonClickEvent -> criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class)));
 
+
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Organizações de Destino"), criarNovaOrganizacao);
         header.setAlignItems(Alignment.CENTER);
         setMaxWidth("16cm");
         add(header);
         add(formLayout);
+        add(paginationLayout);
         add(results);
     }
+
+
 }

@@ -3,6 +3,7 @@ package com.allantoledo.gia.views.gestor.crudTecnico;
 import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.data.service.UsuarioService;
 import com.allantoledo.gia.views.MainLayout;
+import com.allantoledo.gia.views.componentes.PaginationComponent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -27,19 +28,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 
 @PageTitle("Tecnicos")
 @Route(value = "tecnicos", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class ListarTecnico extends VerticalLayout{
+public class ListarTecnico extends VerticalLayout {
     UsuarioService usuarioService;
 
     VirtualList<Usuario> results = new VirtualList<>();
 
     TextField searchField = new TextField();
 
-    private String formatCpf(String cpf){
+    private String formatCpf(String cpf) {
         return cpf.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
     }
 
@@ -64,8 +66,8 @@ public class ListarTecnico extends VerticalLayout{
                 HorizontalLayout dados = new HorizontalLayout();
                 dados.add(new Div(new Text(formatCpf(usuario.getCpf()))));
                 dados.add(new Div(new Text(usuario.getRole().toString())));
-                dados.add(new Div(new Text(usuario.getAtivado()? "ATIVO" : "DESATIVADO")));
-                Button desativar = new Button(usuario.getAtivado()? "DESATIVAR" : "ATIVAR");
+                dados.add(new Div(new Text(usuario.getAtivado() ? "ATIVO" : "DESATIVADO")));
+                Button desativar = new Button(usuario.getAtivado() ? "DESATIVAR" : "ATIVAR");
                 desativar.addClickListener(buttonClickEvent -> {
                     usuario.setAtivado(!usuario.getAtivado());
                     usuarioService.update(usuario);
@@ -80,21 +82,36 @@ public class ListarTecnico extends VerticalLayout{
             });
 
 
-    public ListarTecnico(UsuarioService usuarioService){
+    public ListarTecnico(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
         results.setRenderer(resultCardRenderer);
+        results.setHeightFull();
+        setHeightFull();
+        AtomicReference<Pageable> resultsPage = new AtomicReference<>(PageRequest.of(0, 10));
 
-        results.setItems(usuarioService.list(Pageable.unpaged()).stream().sorted(Comparator.comparing(Usuario::getNome)));
-        Pageable resultsPage = PageRequest.of(0, 10);
+        results.setItems(usuarioService.list(resultsPage.get()).stream().sorted(Comparator.comparing(Usuario::getNome)));
         FormLayout formLayout = new FormLayout();
         searchField.setPlaceholder("Pesquisar por nome");
+
+        PaginationComponent paginationLayout = new PaginationComponent(resultsPage.get(), (page) -> {
+            resultsPage.set(page);
+            results.setItems(usuarioService.list(resultsPage.get(),
+                            UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
+                    .stream().sorted(Comparator.comparing(Usuario::getNome)));
+            return null;
+        });
+
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> results.setItems(
-                usuarioService.list(resultsPage,
-                    UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
-                        .stream().sorted(Comparator.comparing(Usuario::getNome))
-        ));
+        searchButton.addClickListener(buttonClickEvent -> {
+            resultsPage.set(PageRequest.of(0, 10));
+            paginationLayout.resetPage(resultsPage.get());
+            results.setItems(
+                    usuarioService.list(resultsPage.get(),
+                                    UsuarioService.UsuarioSpecification.filterTecnicoByName(searchField.getValue()))
+                            .stream().sorted(Comparator.comparing(Usuario::getNome))
+            );
+        });
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -105,12 +122,14 @@ public class ListarTecnico extends VerticalLayout{
         criarNovoUsuario.setTooltipText("Criar novo usuario");
         criarNovoUsuario.addClickListener(buttonClickEvent -> criarNovoUsuario.getUI().ifPresent(ui -> ui.navigate(CadastrarTecnico.class)));
 
+
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Tecnicos"), criarNovoUsuario);
         header.setAlignItems(Alignment.CENTER);
         setMaxWidth("16cm");
         add(header);
         add(formLayout);
+        add(paginationLayout);
         add(results);
     }
 }

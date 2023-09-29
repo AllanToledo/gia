@@ -118,7 +118,13 @@ public class CadastrarTecnico extends VerticalLayout implements HasUrlParameter<
                 Notification.show(violation.getMessage());
             }
             if (!violations.isEmpty()) return;
-            usuarioService.update(novoUsuario);
+            try {
+                usuarioService.update(novoUsuario);
+            }catch (Exception e){
+                Notification.show("Não é possível cadastrar usuário");
+                return;
+            }
+
             if(usuarioCadastrado != null){
                 Notification.show("Usuário atualizado com sucesso");
             } else {

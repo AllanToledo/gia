@@ -3,6 +3,7 @@ package com.allantoledo.gia.views.gestor.crudDeposito;
 import com.allantoledo.gia.data.entity.Deposito;
 import com.allantoledo.gia.data.service.DepositoService;
 import com.allantoledo.gia.views.MainLayout;
+import com.allantoledo.gia.views.componentes.PaginationComponent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -26,15 +27,17 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 @PageTitle("Depósitos")
 @Route(value = "depositos", layout = MainLayout.class)
 @RolesAllowed("GESTOR")
 @Uses(Icon.class)
-public class ListarDeposito extends VerticalLayout{
+public class ListarDeposito extends VerticalLayout {
     final DepositoService depositoService;
 
-    private String formatCpf(String cpfOrCnpj){
-        if(cpfOrCnpj.length() > 11) return cpfOrCnpj;
+    private String formatCpf(String cpfOrCnpj) {
+        if (cpfOrCnpj.length() > 11) return cpfOrCnpj;
         return cpfOrCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
     }
 
@@ -67,12 +70,13 @@ public class ListarDeposito extends VerticalLayout{
             });
 
 
-    public ListarDeposito(DepositoService depositoService){
+    public ListarDeposito(DepositoService depositoService) {
         this.depositoService = depositoService;
         VirtualList<Deposito> results = new VirtualList<>();
+        results.setHeightFull();
         results.setRenderer(resultCardRenderer);
 
-        Pageable resultsPage = PageRequest.of(0, 10);
+        AtomicReference<Pageable> resultsPage = new AtomicReference<>(PageRequest.of(0, 10));
 
         results.setItems(depositoService.list(Pageable.unpaged()).toList());
         FormLayout formLayout = new FormLayout();
@@ -80,11 +84,22 @@ public class ListarDeposito extends VerticalLayout{
         searchField.setPlaceholder("Pesquisar por nome");
         Button searchButton = new Button("PESQUISAR");
         searchButton.addClickShortcut(Key.ENTER);
-        searchButton.addClickListener(buttonClickEvent -> results.setItems(
-                depositoService.list(resultsPage,
-                                DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
-                        .stream()
-        ));
+
+        PaginationComponent paginationLayout = new PaginationComponent(resultsPage.get(), (nextPage) -> {
+            resultsPage.set(nextPage);
+            results.setItems(depositoService.list(resultsPage.get(),
+                            DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
+                    .stream());
+            return null;
+        });
+
+        searchButton.addClickListener(buttonClickEvent -> {
+            resultsPage.set(PageRequest.of(0, 10));
+            paginationLayout.resetPage(resultsPage.get());
+            results.setItems(depositoService.list(resultsPage.get(),
+                                    DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
+                            .stream());
+        });
 
         formLayout.add(searchField, searchButton);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -95,6 +110,7 @@ public class ListarDeposito extends VerticalLayout{
         criarNovoDeposito.setTooltipText("Criar novo depósito");
         criarNovoDeposito.addClickListener(buttonClickEvent -> criarNovoDeposito.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class)));
 
+
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Depósitos"), criarNovoDeposito);
         header.setAlignItems(Alignment.CENTER);
@@ -102,6 +118,7 @@ public class ListarDeposito extends VerticalLayout{
         setMaxWidth("16cm");
         add(header);
         add(formLayout);
+        add(paginationLayout);
         add(results);
     }
 }
