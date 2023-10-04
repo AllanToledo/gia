@@ -1,9 +1,7 @@
 package com.allantoledo.gia.views.gestor.crudOrganizacoes;
 
 import com.allantoledo.gia.data.entity.OrgaoDestino;
-import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.data.service.OrgaoDestinoService;
-import com.allantoledo.gia.data.service.UsuarioService;
 import com.allantoledo.gia.views.MainLayout;
 import com.allantoledo.gia.views.componentes.PaginationComponent;
 import com.vaadin.flow.component.Component;
@@ -29,7 +27,6 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 @PageTitle("Organizações")
@@ -39,9 +36,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ListarOrgaosDestino extends VerticalLayout {
     final OrgaoDestinoService orgaoDestinoService;
 
-    private String formatCpf(String cpfOrCnpj) {
-        if (cpfOrCnpj.length() > 11) return cpfOrCnpj;
-        return cpfOrCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
+    private String formatCpfCnpj(String cpfOrCnpj) {
+        if (cpfOrCnpj.length() > 11) {
+            return cpfOrCnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5");
+        } else {
+            return cpfOrCnpj.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+        }
+    }
+
+    private String formatContato(String contato) {
+        return contato.replaceAll("(\\d{2})(\\d{5})(\\d{0,4}).*", "($1) $2-$3");
     }
 
     private final ComponentRenderer<Component, OrgaoDestino> resultCardRenderer = new ComponentRenderer<>(
@@ -61,8 +65,8 @@ public class ListarOrgaosDestino extends VerticalLayout {
                 infoLayout.setPadding(false);
                 infoLayout.getElement().appendChild(ElementFactory.createStrong(orgaoDestino.getNome()));
                 HorizontalLayout dados = new HorizontalLayout();
-                dados.add(new Div(new Text(formatCpf(orgaoDestino.getCpfCnpj()))));
-                dados.add(new Div(new Text(orgaoDestino.getContato())));
+                dados.add(new Div(new Text(formatCpfCnpj(orgaoDestino.getCpfCnpj()))));
+                dados.add(new Div(new Text(formatContato(orgaoDestino.getContato()))));
                 Button editar = new Button("EDITAR");
                 editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class, orgaoDestino.getId())));
                 infoLayout.add(dados);
@@ -115,6 +119,7 @@ public class ListarOrgaosDestino extends VerticalLayout {
         criarNovaOrganizacao.setTooltipText("Criar nova organização");
         criarNovaOrganizacao.addClickListener(buttonClickEvent -> criarNovaOrganizacao.getUI().ifPresent(ui -> ui.navigate(CadastrarOrgaoDestino.class)));
 
+        setHeightFull();
 
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Organizações de Destino"), criarNovaOrganizacao);

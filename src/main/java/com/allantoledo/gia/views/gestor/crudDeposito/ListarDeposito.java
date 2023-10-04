@@ -36,9 +36,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ListarDeposito extends VerticalLayout {
     final DepositoService depositoService;
 
-    private String formatCpf(String cpfOrCnpj) {
-        if (cpfOrCnpj.length() > 11) return cpfOrCnpj;
-        return cpfOrCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "***.$2.***-**");
+    private String formatCpfCnpj(String cpfOrCnpj) {
+        if (cpfOrCnpj.length() > 11) {
+            return cpfOrCnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})(\\d{2})", "$1.$2.$3/$4-$5");
+        } else {
+            return cpfOrCnpj.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+        }
+    }
+
+    private String formatContato(String contato) {
+        return contato.replaceAll("(\\d{2})(\\d{5})(\\d{0,4}).*", "($1) $2-$3");
     }
 
     private final ComponentRenderer<Component, Deposito> resultCardRenderer = new ComponentRenderer<>(
@@ -60,8 +67,8 @@ public class ListarDeposito extends VerticalLayout {
                 infoLayout.setPadding(false);
                 infoLayout.getElement().appendChild(ElementFactory.createStrong(deposito.getNome()));
                 HorizontalLayout dados = new HorizontalLayout();
-                dados.add(new Div(new Text(formatCpf(deposito.getCpfCnpj()))));
-                dados.add(new Div(new Text(deposito.getContato())));
+                dados.add(new Div(new Text(formatCpfCnpj(deposito.getCpfCnpj()))));
+                dados.add(new Div(new Text(formatContato(deposito.getContato()))));
                 Button editar = new Button("EDITAR");
                 editar.addClickListener(buttonClickEvent -> editar.getUI().ifPresent(ui -> ui.navigate(CadastrarDeposito.class, deposito.getId())));
                 infoLayout.add(dados);
@@ -97,8 +104,8 @@ public class ListarDeposito extends VerticalLayout {
             resultsPage.set(PageRequest.of(0, 10));
             paginationLayout.resetPage(resultsPage.get());
             results.setItems(depositoService.list(resultsPage.get(),
-                                    DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
-                            .stream());
+                            DepositoService.DepositoSpecification.filterByName(searchField.getValue()))
+                    .stream());
         });
 
         formLayout.add(searchField, searchButton);
@@ -114,7 +121,7 @@ public class ListarDeposito extends VerticalLayout {
         HorizontalLayout header = new HorizontalLayout();
         header.add(new H3("Pesquisar Depósitos"), criarNovoDeposito);
         header.setAlignItems(Alignment.CENTER);
-
+        setHeightFull();
         setMaxWidth("16cm");
         add(header);
         add(formLayout);

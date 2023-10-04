@@ -2,8 +2,11 @@ package com.allantoledo.gia.views.tecnico.crudItemApreendido;
 
 import com.allantoledo.gia.data.entity.CategoriaItem;
 import com.allantoledo.gia.data.entity.ItemApreendido;
+import com.allantoledo.gia.data.entity.Usuario;
 import com.allantoledo.gia.data.service.ItemApreendidoService;
+import com.allantoledo.gia.data.service.UsuarioService;
 import com.allantoledo.gia.views.MainLayout;
+import com.allantoledo.gia.views.componentes.PaginationComponent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
@@ -30,6 +33,8 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 
 @PageTitle("Depositos")
 @Route(value = "apreensoes", layout = MainLayout.class)
@@ -86,18 +91,26 @@ public class ListarItemsApreendidos extends VerticalLayout {
         this.itemApreendidoService = itemApreendidoService;
         VirtualList<ItemApreendido> results = new VirtualList<>();
         results.setRenderer(resultCardRenderer);
-        Pageable resultsPage = PageRequest.of(0, 10);
-        results.setItems(
-                itemApreendidoService.list(resultsPage)
-                        .stream()
-        );
+        results.setHeightFull();
+        AtomicReference<Pageable> resultsPage = new AtomicReference<>(PageRequest.of(0, 10));
+        results.setItems(itemApreendidoService.list(resultsPage.get()).stream());
+
+
         FormLayout formLayout = new FormLayout();
         TextField searchField = new TextField();
         searchField.setPlaceholder("Pesquisar por processo");
         Button searchButton = new Button("PESQUISAR");
+
+        PaginationComponent paginationLayout = new PaginationComponent(resultsPage.get(), (page) -> {
+            resultsPage.set(page);
+            results.setItems(itemApreendidoService.list(resultsPage.get(),
+                    ItemApreendidoService.ItemApreendidoSpecification.filterByProcess(searchField.getValue())).stream());
+            return null;
+        });
+
         searchButton.addClickShortcut(Key.ENTER);
         searchButton.addClickListener(buttonClickEvent -> results.setItems(
-                itemApreendidoService.list(resultsPage,
+                itemApreendidoService.list(resultsPage.get(),
                                 ItemApreendidoService.ItemApreendidoSpecification.filterByProcess(searchField.getValue()))
                         .stream()
         ));
@@ -115,9 +128,11 @@ public class ListarItemsApreendidos extends VerticalLayout {
         header.add(new H3("Pesquisar Apreensões"), criarNovaApreensao);
         header.setAlignItems(Alignment.CENTER);
 
+        setHeightFull();
         setMaxWidth("16cm");
         add(header);
         add(formLayout);
+        add(paginationLayout);
         add(results);
     }
 }
